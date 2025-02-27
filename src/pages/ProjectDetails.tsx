@@ -149,42 +149,42 @@ const projectTasks: Task[] = [
   { 
     id: "task1", 
     title: "Finaliser les plans d'étage", 
-    status: "completed", 
-    priority: "high", 
-    assignee: "Sophie Laurent",
-    dueDate: "2023-03-15" 
+    projectName: "Villa Moderna",
+    dueDate: "2023-03-15",
+    priority: "high",
+    completed: true
   },
   { 
     id: "task2", 
     title: "Soumettre les demandes de permis", 
-    status: "in-progress", 
-    priority: "high", 
-    assignee: "Jean Moreau",
-    dueDate: "2023-04-20" 
+    projectName: "Villa Moderna",
+    dueDate: "2023-04-20",
+    priority: "high",
+    completed: false
   },
   { 
     id: "task3", 
     title: "Sélectionner les matériaux de façade", 
-    status: "in-progress", 
-    priority: "medium", 
-    assignee: "Marie Lefevre",
-    dueDate: "2023-05-10" 
+    projectName: "Villa Moderna",
+    dueDate: "2023-05-10",
+    priority: "medium",
+    completed: false
   },
   { 
     id: "task4", 
     title: "Réviser le budget de construction", 
-    status: "todo", 
-    priority: "medium", 
-    assignee: "Jean Moreau",
-    dueDate: "2023-05-30" 
+    projectName: "Villa Moderna",
+    dueDate: "2023-05-30",
+    priority: "medium",
+    completed: false
   },
   { 
     id: "task5", 
     title: "Planifier la réunion avec les clients", 
-    status: "todo", 
-    priority: "low", 
-    assignee: "Sophie Laurent",
-    dueDate: "2023-06-15" 
+    projectName: "Villa Moderna",
+    dueDate: "2023-06-15",
+    priority: "low",
+    completed: false
   }
 ];
 
@@ -447,7 +447,7 @@ const ProjectDetails = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <TaskList tasks={projectTasks.slice(0, 3)} />
+                  <TaskList tasks={projectTasks.slice(0, 3)} title="Tâches récentes" />
                 </CardContent>
               </Card>
               
@@ -590,7 +590,7 @@ const ProjectDetails = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <TaskList tasks={projectTasks} />
+              <TaskList tasks={projectTasks} title="Toutes les tâches" />
             </CardContent>
           </Card>
         </TabsContent>
