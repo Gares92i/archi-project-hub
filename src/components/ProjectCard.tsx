@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 
 export interface ProjectCardProps {
   id: string;
@@ -84,7 +85,9 @@ const ProjectCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Ouvrir le projet</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={`/projects/${id}`}>Ouvrir le projet</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Modifier</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive">Archiver</DropdownMenuItem>
@@ -125,8 +128,8 @@ const ProjectCard = ({
         </div>
       </CardContent>
       <CardFooter className="pt-2">
-        <Button variant="outline" size="sm" className="w-full">
-          Voir les détails
+        <Button variant="outline" size="sm" className="w-full" asChild>
+          <Link to={`/projects/${id}`}>Voir les détails</Link>
         </Button>
       </CardFooter>
     </Card>
