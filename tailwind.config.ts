@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				architect: {
+					50: "#F9F9F8",
+					100: "#F2F2F0",
+					200: "#E5E5E1",
+					300: "#D8D8D3",
+					400: "#CACAC4",
+					500: "#ABABAB",
+					600: "#8C8C8C",
+					700: "#6D6D6D",
+					800: "#4E4E4E",
+					900: "#2F2F2F",
+					950: "#151515"
 				}
 			},
 			borderRadius: {
@@ -84,11 +98,30 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				fadeIn: {
+					from: { opacity: '0' },
+					to: { opacity: '1' }
+				},
+				slideUp: {
+					from: { transform: 'translateY(10px)', opacity: '0' },
+					to: { transform: 'translateY(0)', opacity: '1' }
+				},
+				slideIn: {
+					from: { transform: 'translateX(10px)', opacity: '0' },
+					to: { transform: 'translateX(0)', opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.5s ease-out',
+				'slide-up': 'slideUp 0.5s ease-out',
+				'slide-in': 'slideIn 0.5s ease-out'
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				display: ['Work Sans', 'sans-serif']
 			}
 		}
 	},
