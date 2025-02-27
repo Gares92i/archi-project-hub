@@ -125,7 +125,7 @@ const typeConfig = {
 const CalendarPage = () => {
   const currentEvents = adjustDatesToCurrentMonth(mockEvents);
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedProject, setSelectedProject] = useState<string | undefined>(undefined);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
   
   // Filter events based on selected date and project
   const getEventsForDate = (date: Date | undefined) => {
@@ -221,14 +221,14 @@ const CalendarPage = () => {
             <CardContent>
               <div className="flex flex-col space-y-4">
                 <Select 
-                  value={selectedProject} 
-                  onValueChange={(value) => setSelectedProject(value)}
+                  value={selectedProject || "all"} 
+                  onValueChange={(value) => setSelectedProject(value === "all" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Tous les projets" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les projets</SelectItem>
+                    <SelectItem value="all">Tous les projets</SelectItem>
                     {projects.map(project => (
                       <SelectItem key={project} value={project}>
                         {project}
