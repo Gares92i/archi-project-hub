@@ -16,7 +16,7 @@ const recentTasks = [
     title: "Finaliser les plans d'étage pour Villa Moderna",
     projectName: "Villa Moderna",
     dueDate: "2023-06-30",
-    priority: "high",
+    priority: "high" as const,
     completed: false,
   },
   {
@@ -24,7 +24,7 @@ const recentTasks = [
     title: "Réviser le cahier des charges pour Tour Horizon",
     projectName: "Tour Horizon",
     dueDate: "2023-06-25",
-    priority: "medium",
+    priority: "medium" as const,
     completed: false,
   },
   {
@@ -32,7 +32,7 @@ const recentTasks = [
     title: "Préparer la présentation client pour Résidence Eterna",
     projectName: "Résidence Eterna",
     dueDate: "2023-06-24",
-    priority: "low",
+    priority: "low" as const,
     completed: true,
   },
   {
@@ -40,7 +40,7 @@ const recentTasks = [
     title: "Soumettre les permis de construire pour Centre Commercial Lumina",
     projectName: "Centre Commercial Lumina",
     dueDate: "2023-06-28",
-    priority: "high",
+    priority: "high" as const,
     completed: false,
   },
 ];
@@ -49,7 +49,7 @@ const recentDocuments = [
   {
     id: "1",
     name: "Villa_Moderna_Plans_Final.pdf",
-    type: "pdf",
+    type: "pdf" as const,
     projectName: "Villa Moderna",
     uploadDate: "2023-06-20",
     size: "4.2 MB",
@@ -57,7 +57,7 @@ const recentDocuments = [
   {
     id: "2",
     name: "Tour_Horizon_CCTP.docx",
-    type: "doc",
+    type: "doc" as const,
     projectName: "Tour Horizon",
     uploadDate: "2023-06-18",
     size: "1.8 MB",
@@ -65,7 +65,7 @@ const recentDocuments = [
   {
     id: "3",
     name: "Residence_Eterna_Presentation.pptx",
-    type: "other",
+    type: "other" as const,
     projectName: "Résidence Eterna",
     uploadDate: "2023-06-19",
     size: "12.5 MB",
@@ -73,7 +73,7 @@ const recentDocuments = [
   {
     id: "4",
     name: "Rendu_3D_Facade_Principale.jpg",
-    type: "img",
+    type: "img" as const,
     projectName: "Villa Moderna",
     uploadDate: "2023-06-17",
     size: "8.7 MB",
