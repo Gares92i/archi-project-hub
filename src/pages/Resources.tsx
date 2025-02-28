@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Resource {
   id: string;
@@ -163,6 +174,17 @@ const Resources = () => {
     }).format(date);
   };
 
+  const [isResourceSheetOpen, setIsResourceSheetOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleAddResource = () => {
+    toast({
+      title: "Ressource ajoutée",
+      description: "La nouvelle ressource a été ajoutée avec succès"
+    });
+    setIsResourceSheetOpen(false);
+  };
+
   return (
     <MainLayout>
       <div className="mb-8">
@@ -173,7 +195,7 @@ const Resources = () => {
               Consultez et téléchargez les ressources partagées
             </p>
           </div>
-          <Button>
+          <Button onClick={() => setIsResourceSheetOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Ajouter une ressource
           </Button>
@@ -292,6 +314,66 @@ const Resources = () => {
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Panneau d'ajout de ressource */}
+      <Sheet open={isResourceSheetOpen} onOpenChange={setIsResourceSheetOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Ajouter une ressource</SheetTitle>
+            <SheetDescription>
+              Ajoutez une nouvelle ressource à partager avec l'équipe.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="resource-name">Nom de la ressource</Label>
+              <Input id="resource-name" placeholder="Entrez le nom de la ressource" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resource-type">Type</Label>
+              <Select>
+                <SelectTrigger id="resource-type">
+                  <SelectValue placeholder="Sélectionner un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="document">Document</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="video">Vidéo</SelectItem>
+                  <SelectItem value="archive">Archive</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resource-category">Catégorie</Label>
+              <Select>
+                <SelectTrigger id="resource-category">
+                  <SelectValue placeholder="Sélectionner une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="templates">Templates</SelectItem>
+                  <SelectItem value="standards">Normes</SelectItem>
+                  <SelectItem value="materials">Matériaux</SelectItem>
+                  <SelectItem value="tutorials">Tutoriels</SelectItem>
+                  <SelectItem value="software">Logiciels</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resource-file">Fichier</Label>
+              <Input id="resource-file" type="file" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resource-description">Description (optionnelle)</Label>
+              <Input id="resource-description" placeholder="Description de la ressource" />
+            </div>
+          </div>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsResourceSheetOpen(false)}>Annuler</Button>
+            <Button onClick={handleAddResource}>Ajouter la ressource</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </MainLayout>
   );
 };

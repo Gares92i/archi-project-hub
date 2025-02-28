@@ -27,6 +27,15 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock documents data
 const documentsData: Document[] = [
@@ -117,6 +126,9 @@ const Documents = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDocuments, setFilteredDocuments] = useState(documentsData);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [isImportSheetOpen, setIsImportSheetOpen] = useState(false);
+  const [isNewDocumentSheetOpen, setIsNewDocumentSheetOpen] = useState(false);
+  const { toast } = useToast();
   
   const filterDocuments = (type: string) => {
     if (selectedTypes.includes(type)) {
@@ -154,6 +166,22 @@ const Documents = () => {
     setFilteredDocuments(results);
   };
 
+  const handleImportDocument = () => {
+    toast({
+      title: "Document importé",
+      description: "Le document a été importé avec succès"
+    });
+    setIsImportSheetOpen(false);
+  };
+
+  const handleCreateDocument = () => {
+    toast({
+      title: "Document créé",
+      description: "Le nouveau document a été créé avec succès"
+    });
+    setIsNewDocumentSheetOpen(false);
+  };
+
   const groupedDocuments = groupByProject(filteredDocuments);
 
   return (
@@ -167,11 +195,11 @@ const Documents = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setIsImportSheetOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Importer
             </Button>
-            <Button>
+            <Button onClick={() => setIsNewDocumentSheetOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Nouveau document
             </Button>
@@ -309,6 +337,116 @@ const Documents = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Panneau d'importation de document */}
+      <Sheet open={isImportSheetOpen} onOpenChange={setIsImportSheetOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Importer un document</SheetTitle>
+            <SheetDescription>
+              Importez un document existant dans votre projet.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="import-file">Sélectionner un fichier</Label>
+              <Input id="import-file" type="file" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="project-name">Projet associé</Label>
+              <Select>
+                <SelectTrigger id="project-name">
+                  <SelectValue placeholder="Sélectionner un projet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="villa-moderna">Villa Moderna</SelectItem>
+                  <SelectItem value="tour-horizon">Tour Horizon</SelectItem>
+                  <SelectItem value="residence-eterna">Résidence Eterna</SelectItem>
+                  <SelectItem value="centre-commercial">Centre Commercial Lumina</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document-category">Catégorie</Label>
+              <Select>
+                <SelectTrigger id="document-category">
+                  <SelectValue placeholder="Sélectionner une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="plans">Plans</SelectItem>
+                  <SelectItem value="contracts">Contrats</SelectItem>
+                  <SelectItem value="renderings">Rendus</SelectItem>
+                  <SelectItem value="specifications">Spécifications</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document-description">Description (optionnelle)</Label>
+              <Input id="document-description" placeholder="Description du document" />
+            </div>
+          </div>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsImportSheetOpen(false)}>Annuler</Button>
+            <Button onClick={handleImportDocument}>Importer</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      {/* Panneau de création de nouveau document */}
+      <Sheet open={isNewDocumentSheetOpen} onOpenChange={setIsNewDocumentSheetOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Nouveau document</SheetTitle>
+            <SheetDescription>
+              Créez un nouveau document pour votre projet.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="document-name">Nom du document</Label>
+              <Input id="document-name" placeholder="Entrez le nom du document" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document-project">Projet associé</Label>
+              <Select>
+                <SelectTrigger id="document-project">
+                  <SelectValue placeholder="Sélectionner un projet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="villa-moderna">Villa Moderna</SelectItem>
+                  <SelectItem value="tour-horizon">Tour Horizon</SelectItem>
+                  <SelectItem value="residence-eterna">Résidence Eterna</SelectItem>
+                  <SelectItem value="centre-commercial">Centre Commercial Lumina</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document-type">Type de document</Label>
+              <Select>
+                <SelectTrigger id="document-type">
+                  <SelectValue placeholder="Sélectionner un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="specification">Cahier des charges</SelectItem>
+                  <SelectItem value="plan">Plan d'architecture</SelectItem>
+                  <SelectItem value="contract">Contrat</SelectItem>
+                  <SelectItem value="proposal">Proposition</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document-content">Contenu</Label>
+              <Input id="document-content" placeholder="Texte ou URL du contenu" />
+            </div>
+          </div>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsNewDocumentSheetOpen(false)}>Annuler</Button>
+            <Button onClick={handleCreateDocument}>Créer le document</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </MainLayout>
   );
 };
