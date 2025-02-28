@@ -59,7 +59,7 @@ const Sidebar = () => {
 
       <div
         className={cn(
-          "min-h-screen fixed inset-y-0 z-40 flex flex-col border-r bg-background",
+          "min-h-screen fixed lg:relative inset-y-0 z-40 flex flex-col border-r bg-background",
           sidebar.openMobile ? "left-0" : "-left-full md:left-0",
           isCollapsed ? "md:w-16" : "md:w-64",
           "transition-all duration-300 ease-in-out"

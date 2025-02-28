@@ -13,7 +13,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col w-full">
+        <div className="flex-1 flex flex-col w-full ml-0 md:ml-16 lg:ml-0">
           <Navbar />
           <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 overflow-auto">
             <div className="mx-auto max-w-full animate-fade-in">
