@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for demonstration
 const recentTasks = [
@@ -116,6 +119,19 @@ const notificationsList = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const handleNewProject = () => {
+    // Dans une application réelle, cela ouvrirait probablement un formulaire de création de projet
+    toast({
+      title: "Création de projet",
+      description: "Formulaire de création de projet en cours de développement",
+    });
+    // Rediriger vers la page des projets
+    navigate("/projects");
+  };
+
   return (
     <MainLayout>
       <div className="mb-8">
@@ -126,7 +142,7 @@ const Index = () => {
               Bienvenue dans votre espace de gestion de projets architecturaux
             </p>
           </div>
-          <Button>+ Nouveau projet</Button>
+          <Button onClick={handleNewProject}>+ Nouveau projet</Button>
         </div>
       </div>
 

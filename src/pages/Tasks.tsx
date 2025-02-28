@@ -9,6 +9,17 @@ import TaskList, { Task } from "@/components/TaskList";
 import { Plus, Search, Filter, Calendar, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Données de démonstration pour les tâches
 const tasksData: Task[] = [
@@ -112,11 +123,23 @@ const tasksData: Task[] = [
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>(tasksData);
+  const [isNewTaskSheetOpen, setIsNewTaskSheetOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleCompleteTask = (id: string, completed: boolean) => {
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed } : task
     ));
+  };
+
+  const handleCreateTask = () => {
+    // Dans une application réelle, nous prendrions ici les données du formulaire
+    // et les soumettrions à une API
+    toast({
+      title: "Tâche créée",
+      description: "La nouvelle tâche a été créée avec succès",
+    });
+    setIsNewTaskSheetOpen(false);
   };
 
   // Filtrer les tâches pour différentes vues
@@ -141,7 +164,7 @@ const Tasks = () => {
               Gérez et organisez vos tâches sur tous les projets
             </p>
           </div>
-          <Button>
+          <Button onClick={() => setIsNewTaskSheetOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle tâche
           </Button>
@@ -288,6 +311,68 @@ const Tasks = () => {
           />
         </TabsContent>
       </Tabs>
+
+      {/* Panneau de création de tâche */}
+      <Sheet open={isNewTaskSheetOpen} onOpenChange={setIsNewTaskSheetOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Nouvelle tâche</SheetTitle>
+            <SheetDescription>
+              Créez une nouvelle tâche pour un projet. Remplissez les détails ci-dessous.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="task-title">Titre de la tâche</Label>
+              <Input id="task-title" placeholder="Entrez le titre de la tâche" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="project-name">Projet associé</Label>
+              <Select>
+                <SelectTrigger id="project-name">
+                  <SelectValue placeholder="Sélectionner un projet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="villa-moderna">Villa Moderna</SelectItem>
+                  <SelectItem value="tour-horizon">Tour Horizon</SelectItem>
+                  <SelectItem value="residence-eterna">Résidence Eterna</SelectItem>
+                  <SelectItem value="centre-commercial">Centre Commercial Lumina</SelectItem>
+                  <SelectItem value="bureaux-panorama">Bureaux Panorama</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="due-date">Date d'échéance</Label>
+              <Input id="due-date" type="date" />
+            </div>
+            <div className="space-y-2">
+              <Label>Priorité</Label>
+              <RadioGroup defaultValue="medium">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="low" id="low" />
+                  <Label htmlFor="low">Faible</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="medium" id="medium" />
+                  <Label htmlFor="medium">Moyenne</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="high" id="high" />
+                  <Label htmlFor="high">Haute</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="task-description">Description (optionnelle)</Label>
+              <Input id="task-description" placeholder="Description de la tâche" />
+            </div>
+          </div>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsNewTaskSheetOpen(false)}>Annuler</Button>
+            <Button onClick={handleCreateTask}>Créer la tâche</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </MainLayout>
   );
 };

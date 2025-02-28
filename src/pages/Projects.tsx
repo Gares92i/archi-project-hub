@@ -26,6 +26,15 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock projects data for demonstration
 const projectsData: ProjectCardProps[] = [
@@ -125,6 +134,8 @@ const Projects = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProjects, setFilteredProjects] = useState(projectsData);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [isNewProjectSheetOpen, setIsNewProjectSheetOpen] = useState(false);
+  const { toast } = useToast();
   
   const filterProjects = (status: string) => {
     if (selectedStatuses.includes(status)) {
@@ -163,6 +174,16 @@ const Projects = () => {
     setFilteredProjects(results);
   };
 
+  const handleCreateProject = () => {
+    // Dans une application réelle, nous prendrions ici les données du formulaire
+    // et les soumettrions à une API
+    toast({
+      title: "Projet créé",
+      description: "Le nouveau projet a été créé avec succès",
+    });
+    setIsNewProjectSheetOpen(false);
+  };
+
   return (
     <MainLayout>
       <div className="mb-8">
@@ -173,7 +194,7 @@ const Projects = () => {
               Gérez tous vos projets architecturaux en un seul endroit
             </p>
           </div>
-          <Button>
+          <Button onClick={() => setIsNewProjectSheetOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau projet
           </Button>
@@ -359,6 +380,61 @@ const Projects = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Panneau de création de projet */}
+      <Sheet open={isNewProjectSheetOpen} onOpenChange={setIsNewProjectSheetOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Nouveau projet</SheetTitle>
+            <SheetDescription>
+              Créez un nouveau projet architectural. Remplissez les détails ci-dessous.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="project-name">Nom du projet</Label>
+              <Input id="project-name" placeholder="Entrez le nom du projet" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="client-name">Client</Label>
+              <Input id="client-name" placeholder="Nom du client" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="project-location">Emplacement</Label>
+              <Input id="project-location" placeholder="Ville, Pays" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="start-date">Date de début</Label>
+                <Input id="start-date" type="date" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end-date">Date de fin prévue</Label>
+                <Input id="end-date" type="date" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="project-status">Statut</Label>
+              <Select>
+                <SelectTrigger id="project-status">
+                  <SelectValue placeholder="Sélectionner un statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="planning">Planification</SelectItem>
+                  <SelectItem value="design">Conception</SelectItem>
+                  <SelectItem value="construction">Construction</SelectItem>
+                  <SelectItem value="completed">Terminé</SelectItem>
+                  <SelectItem value="on-hold">En pause</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsNewProjectSheetOpen(false)}>Annuler</Button>
+            <Button onClick={handleCreateProject}>Créer le projet</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </MainLayout>
   );
 };
