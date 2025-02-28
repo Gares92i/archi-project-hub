@@ -3,7 +3,7 @@ import { FolderKanban, LayoutDashboard, FileText, Calendar, Users, Briefcase, Se
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useMobileDetect } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 interface NavItemProps {
@@ -32,21 +32,21 @@ const NavItem = ({ to, icon, label, isCollapsed }: NavItemProps) => (
 );
 
 const Sidebar = () => {
-  const { isOpen, toggle, setIsOpen } = useSidebar();
-  const { isMobile } = useMobileDetect();
-  const isCollapsed = !isOpen;
+  const sidebar = useSidebar();
+  const isMobile = useIsMobile();
+  const isCollapsed = sidebar.state === "collapsed";
 
   const handleSidebarOpenClose = () => {
     if (isMobile) {
-      setIsOpen(!isOpen);
+      sidebar.setOpenMobile(!sidebar.openMobile);
     } else {
-      toggle();
+      sidebar.toggleSidebar();
     }
   };
 
   return (
     <>
-      {isMobile && !isOpen && (
+      {isMobile && !sidebar.openMobile && (
         <Button
           variant="outline"
           size="icon"
@@ -60,7 +60,7 @@ const Sidebar = () => {
       <div
         className={cn(
           "min-h-screen fixed inset-y-0 z-40 flex flex-col border-r bg-background",
-          isOpen ? "left-0" : "-left-full md:left-0",
+          sidebar.openMobile ? "left-0" : "-left-full md:left-0",
           isCollapsed ? "md:w-16" : "md:w-64",
           "transition-all duration-300 ease-in-out"
         )}
@@ -161,7 +161,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {isMobile && isOpen && (
+      {isMobile && sidebar.openMobile && (
         <div
           className="fixed inset-0 z-30 bg-black/50"
           onClick={handleSidebarOpenClose}
