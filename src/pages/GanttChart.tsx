@@ -10,7 +10,7 @@ const GanttChart = () => {
   const [selectedProject, setSelectedProject] = useState(projectsData[0].id);
   
   const currentProject = projectsData.find(p => p.id === selectedProject) || projectsData[0];
-  const { dateRange, chartData } = useGanttData(currentProject);
+  const { dateRange, chartData, updateTask } = useGanttData(currentProject);
 
   return (
     <MainLayout>
@@ -28,6 +28,7 @@ const GanttChart = () => {
           projectName={currentProject.name}
           chartData={chartData}
           dateRange={dateRange}
+          onTaskUpdate={updateTask}
         />
       </div>
     </MainLayout>

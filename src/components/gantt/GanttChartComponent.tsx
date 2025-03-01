@@ -39,7 +39,7 @@ const GanttChartComponent = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!dragState.taskId || !dragState.originalStart || !dragState.originalEnd || !dragState.startPosition) return;
+    if (!dragState.taskId || !dragState.originalStart || !dragState.originalEnd || dragState.startPosition === null) return;
     
     // Calculate the number of days moved based on chart coordinates
     const chartContainer = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -79,6 +79,15 @@ const GanttChartComponent = ({
     // Call the update handler
     if (onTaskUpdate) {
       onTaskUpdate(task.id, newStartDate, newEndDate);
+      
+      // Reset drag state after update to allow a fresh drag
+      setDragState({
+        taskId: null,
+        originalStart: null,
+        originalEnd: null,
+        startPosition: null,
+        type: null
+      });
     }
   };
 

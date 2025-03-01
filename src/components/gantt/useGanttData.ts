@@ -50,6 +50,7 @@ export const useGanttData = (currentProject: Project) => {
   }, [tasks, formatTasksForChart]);
 
   const updateTask = useCallback((taskId: string, newStart: Date, newEnd: Date) => {
+    console.log("Updating task:", taskId, newStart, newEnd);
     setTasks(prevTasks => 
       prevTasks.map(task => 
         task.id === taskId 
