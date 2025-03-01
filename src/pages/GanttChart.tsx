@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,6 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Rectangle } 
 import { format, addDays, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { fr } from "date-fns/locale";
 
-// Sample project data - in a real app, this would come from an API or store
 const projectsData = [
   {
     id: "1",
@@ -44,7 +42,6 @@ const projectsData = [
   }
 ];
 
-// Custom tooltip for the Gantt chart
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -60,16 +57,15 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-// Custom shape for the Gantt bars
 const CustomBar = (props: any) => {
-  const { x, y, width, height, progress } = props;
+  const { x, y, width, height, payload } = props;
   
-  // Calculate width of the progress portion
+  const progress = payload.progress || 0;
+  
   const progressWidth = (width * progress) / 100;
   
   return (
     <g>
-      {/* Background bar */}
       <Rectangle 
         x={x} 
         y={y} 
@@ -78,7 +74,6 @@ const CustomBar = (props: any) => {
         fill="#e0e0e0" 
         radius={[4, 4, 4, 4]}
       />
-      {/* Progress bar */}
       <Rectangle 
         x={x} 
         y={y} 
@@ -96,34 +91,28 @@ const GanttChart = () => {
   const [dateRange, setDateRange] = useState<Date[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   
-  // Find the current project based on selected ID
   const currentProject = projectsData.find(p => p.id === selectedProject) || projectsData[0];
 
   useEffect(() => {
     if (!currentProject.tasks.length) return;
     
-    // Find earliest start date and latest end date
     const startDates = currentProject.tasks.map(t => new Date(t.start));
     const endDates = currentProject.tasks.map(t => new Date(t.end));
     
     const earliestDate = new Date(Math.min(...startDates.map(d => d.getTime())));
     const latestDate = new Date(Math.max(...endDates.map(d => d.getTime())));
     
-    // Add padding to the date range
     const rangeStart = startOfWeek(addDays(earliestDate, -7), { weekStartsOn: 1 });
     const rangeEnd = endOfWeek(addDays(latestDate, 7), { weekStartsOn: 1 });
     
-    // Create array of all dates in range
     const dates = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
     setDateRange(dates);
     
-    // Prepare data for the chart
     const formattedData = currentProject.tasks.map(task => ({
       name: task.name,
       start: new Date(task.start).getTime(),
       end: new Date(task.end).getTime(),
       progress: task.progress,
-      // For the chart, we need to calculate positions
       startPosition: dates.findIndex(d => 
         d.toISOString().split('T')[0] === new Date(task.start).toISOString().split('T')[0]
       ),
@@ -190,11 +179,8 @@ const GanttChart = () => {
                         fill="#8884d8" 
                         shape={<CustomBar />}
                         background={{ fill: 'transparent' }}
-                        // Position the bars correctly based on start date
                         barSize={20}
                         minPointSize={2}
-                        // Add x and progress as props to be used in CustomBar
-                        style={{ data: { x: (d: any) => d.startPosition, progress: (d: any) => d.progress } }}
                       />
                     </BarChart>
                   </ResponsiveContainer>

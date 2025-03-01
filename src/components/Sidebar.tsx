@@ -1,5 +1,4 @@
-
-import { FolderKanban, LayoutDashboard, FileText, Calendar, Users, Briefcase, Settings, LogOut, ChevronLeft, Menu, Paperclip, CheckSquare, Timeline } from "lucide-react";
+import { FolderKanban, LayoutDashboard, FileText, Calendar, Users, Briefcase, Settings, LogOut, ChevronLeft, Menu, Paperclip, CheckSquare, LineChart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -115,7 +114,7 @@ const Sidebar = () => {
               />
               <NavItem
                 to="/gantt"
-                icon={<Timeline className="h-5 w-5" />}
+                icon={<LineChart className="h-5 w-5" />}
                 label="Planning Gantt"
                 isCollapsed={isCollapsed}
               />
