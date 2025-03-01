@@ -13,7 +13,7 @@ const GanttChart = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
   
   const currentProject = projectsData.find(p => p.id === selectedProject) || projectsData[0];
-  const { chartData, updateTask } = useGanttData(currentProject);
+  const { chartData, tasks, updateTask } = useGanttData(currentProject);
 
   useEffect(() => {
     if (ganttContainer.current) {
@@ -41,7 +41,7 @@ const GanttChart = () => {
       gantt.init(ganttContainer.current);
       
       // Convert our data format to dhtmlx-gantt format
-      const tasks = {
+      const ganttTasks = {
         data: chartData.map(task => ({
           id: task.id,
           text: task.name,
@@ -51,17 +51,21 @@ const GanttChart = () => {
         }))
       };
       
-      gantt.parse(tasks);
+      gantt.clearAll();
+      gantt.parse(ganttTasks);
       
-      // Handle task updates
+      // Handle task updates - use custom event handlers to ensure changes are saved
       gantt.attachEvent("onAfterTaskDrag", (id, mode) => {
         const task = gantt.getTask(id);
         const startDate = new Date(task.start_date);
         const endDate = new Date(task.end_date);
+        
+        // Call our updateTask function to persist the changes
         updateTask(id, startDate, endDate);
-        toast.success("Task updated successfully");
+        return true;
       });
       
+      // Also handle progress changes
       gantt.attachEvent("onTaskDblClick", (id) => {
         const task = gantt.getTask(id);
         toast.info(`Task: ${task.text}, Progress: ${Math.round(task.progress * 100)}%`);
@@ -74,6 +78,24 @@ const GanttChart = () => {
       };
     }
   }, [chartData, updateTask]);
+
+  // Refresh the chart when tasks change
+  useEffect(() => {
+    if (ganttContainer.current && tasks.length > 0) {
+      const ganttTasks = {
+        data: chartData.map(task => ({
+          id: task.id,
+          text: task.name,
+          start_date: new Date(task.start).toISOString().split('T')[0],
+          duration: task.duration,
+          progress: task.progress
+        }))
+      };
+      
+      gantt.clearAll();
+      gantt.parse(ganttTasks);
+    }
+  }, [tasks, chartData]);
 
   return (
     <MainLayout>

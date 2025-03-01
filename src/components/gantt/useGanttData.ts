@@ -48,7 +48,10 @@ export const useGanttData = (currentProject: Project) => {
           : task
       )
     );
+    
+    // Show confirmation to user
+    toast.success(`Task updated successfully`);
   }, []);
 
-  return { chartData, updateTask };
+  return { chartData, tasks, updateTask };
 };

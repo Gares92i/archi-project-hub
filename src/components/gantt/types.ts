@@ -1,3 +1,4 @@
+
 export interface Task {
   id: string;
   name: string;
@@ -22,4 +23,4 @@ export interface ChartTask {
   duration: number;
 }
 
-// No longer need DragState as dhtmlx-gantt handles this internally
+// dhtmlx-gantt handles drag state internally now
