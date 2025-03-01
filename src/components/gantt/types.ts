@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   name: string;
@@ -23,10 +22,4 @@ export interface ChartTask {
   duration: number;
 }
 
-export interface DragState {
-  taskId: string | null;
-  originalStart: number | null;
-  originalEnd: number | null;
-  startPosition: number | null;
-  type: 'move' | 'resize-start' | 'resize-end' | null;
-}
+// No longer need DragState as dhtmlx-gantt handles this internally

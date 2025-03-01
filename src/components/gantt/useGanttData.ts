@@ -2,22 +2,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { addDays, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { Project, ChartTask, Task } from "./types";
+import { toast } from "sonner";
 
 export const useGanttData = (currentProject: Project) => {
-  const [dateRange, setDateRange] = useState<Date[]>([]);
   const [chartData, setChartData] = useState<ChartTask[]>([]);
   const [tasks, setTasks] = useState<Task[]>(currentProject.tasks);
 
-  const formatTasksForChart = useCallback((projectTasks: Task[], dates: Date[]) => {
+  const formatTasksForChart = useCallback((projectTasks: Task[]) => {
     return projectTasks.map(task => ({
       id: task.id,
       name: task.name,
       start: new Date(task.start).getTime(),
       end: new Date(task.end).getTime(),
       progress: task.progress,
-      startPosition: dates.findIndex(d => 
-        d.toISOString().split('T')[0] === new Date(task.start).toISOString().split('T')[0]
-      ),
+      startPosition: 0,
       duration: Math.ceil((new Date(task.end).getTime() - new Date(task.start).getTime()) / (1000 * 60 * 60 * 24)) + 1
     }));
   }, []);
@@ -33,19 +31,7 @@ export const useGanttData = (currentProject: Project) => {
       return;
     }
     
-    const startDates = tasks.map(t => new Date(t.start));
-    const endDates = tasks.map(t => new Date(t.end));
-    
-    const earliestDate = new Date(Math.min(...startDates.map(d => d.getTime())));
-    const latestDate = new Date(Math.max(...endDates.map(d => d.getTime())));
-    
-    const rangeStart = startOfWeek(addDays(earliestDate, -7), { weekStartsOn: 1 });
-    const rangeEnd = endOfWeek(addDays(latestDate, 7), { weekStartsOn: 1 });
-    
-    const dates = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
-    setDateRange(dates);
-    
-    const formattedData = formatTasksForChart(tasks, dates);
+    const formattedData = formatTasksForChart(tasks);
     setChartData(formattedData);
   }, [tasks, formatTasksForChart]);
 
@@ -64,5 +50,5 @@ export const useGanttData = (currentProject: Project) => {
     );
   }, []);
 
-  return { dateRange, chartData, updateTask };
+  return { chartData, updateTask };
 };
