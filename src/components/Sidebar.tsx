@@ -1,5 +1,5 @@
 
-import { FolderKanban, LayoutDashboard, FileText, Calendar, Users, Briefcase, Settings, LogOut, ChevronLeft, Menu, Paperclip, CheckSquare } from "lucide-react";
+import { FolderKanban, LayoutDashboard, FileText, Calendar, Users, Briefcase, Settings, LogOut, ChevronLeft, Menu, Paperclip, CheckSquare, Timeline } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -111,6 +111,12 @@ const Sidebar = () => {
                 to="/tasks"
                 icon={<CheckSquare className="h-5 w-5" />}
                 label="Tâches"
+                isCollapsed={isCollapsed}
+              />
+              <NavItem
+                to="/gantt"
+                icon={<Timeline className="h-5 w-5" />}
+                label="Planning Gantt"
                 isCollapsed={isCollapsed}
               />
               <NavItem

@@ -13,6 +13,7 @@ import Team from "./pages/Team";
 import Resources from "./pages/Resources";
 import Settings from "./pages/Settings";
 import Tasks from "./pages/Tasks";
+import GanttChart from "./pages/GanttChart";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/resources" element={<Resources />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/gantt" element={<GanttChart />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
