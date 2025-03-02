@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { projectsData } from "@/components/gantt/data";
@@ -5,7 +6,6 @@ import ProjectSelector from "@/components/gantt/ProjectSelector";
 import { useGanttData } from "@/components/gantt/useGanttData";
 import { gantt } from "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { Task } from "@/components/gantt/types";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";

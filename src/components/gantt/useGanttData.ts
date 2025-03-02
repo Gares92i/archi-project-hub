@@ -51,6 +51,11 @@ export const useGanttData = (currentProject: Project) => {
       console.log("Updating task:", taskId, newStart, newEnd, progress);
       const updatedTask = await updateTaskDates(taskId, newStart, newEnd);
       
+      // Update the progress separately if needed
+      if (updatedTask && typeof progress === 'number') {
+        updatedTask.progress = progress;
+      }
+      
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId ? updatedTask : task
