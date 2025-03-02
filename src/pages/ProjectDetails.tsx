@@ -33,8 +33,9 @@ import {
 import { ProjectCardProps } from "@/components/ProjectCard";
 import TaskList from "@/components/TaskList";
 import { Task } from "@/components/gantt/types";
+import { useToast } from "@/hooks/use-toast";
+import { Document } from "@/components/DocumentsList";
 
-// Mock projects data for demonstration
 const projectsData: ProjectCardProps[] = [
   {
     id: "1",
@@ -136,7 +137,6 @@ const statusConfig = {
   "on-hold": { label: "En pause", color: "bg-gray-500" },
 };
 
-// Mock team members
 const teamMembers = [
   { id: "1", name: "Sophie Laurent", role: "Architecte principal", avatar: "https://i.pravatar.cc/150?u=1" },
   { id: "2", name: "Thomas Dubois", role: "Ingénieur structure", avatar: "https://i.pravatar.cc/150?u=2" },
@@ -145,7 +145,6 @@ const teamMembers = [
   { id: "5", name: "Camille Bernard", role: "Architecte paysagiste", avatar: "https://i.pravatar.cc/150?u=5" },
 ];
 
-// Mock tasks for the project
 const projectTasks: Task[] = [
   { 
     id: "task1", 
@@ -209,8 +208,7 @@ const projectTasks: Task[] = [
   }
 ];
 
-// Mock documents for the project
-const projectDocuments = [
+const projectDocuments: Document[] = [
   { id: "doc1", name: "Plans_architecturaux_v2.pdf", type: "pdf", size: "8.5 MB", date: "2023-03-10" },
   { id: "doc2", name: "Budget_prévisionnel.xlsx", type: "xls", size: "1.2 MB", date: "2023-02-28" },
   { id: "doc3", name: "Rendus_3D_facade.jpg", type: "img", size: "5.7 MB", date: "2023-03-15" },
@@ -218,7 +216,6 @@ const projectDocuments = [
   { id: "doc5", name: "Calendrier_travaux.xlsx", type: "xls", size: "0.9 MB", date: "2023-03-05" },
 ];
 
-// Mock milestones for the project
 const projectMilestones = [
   { id: "m1", title: "Approbation des plans", date: "2023-02-15", completed: true },
   { id: "m2", title: "Obtention du permis de construire", date: "2023-05-20", completed: false },
@@ -228,7 +225,6 @@ const projectMilestones = [
   { id: "m6", title: "Livraison au client", date: "2023-12-20", completed: false },
 ];
 
-// Project statistics for charts
 const projectStats = {
   budgetTotal: 750000,
   budgetUsed: 425000,
@@ -246,15 +242,15 @@ const ProjectDetails = () => {
   const navigate = useNavigate();
   const [project, setProject] = useState<ProjectCardProps | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate API call to fetch project details
     const foundProject = projectsData.find(p => p.id === id);
     if (foundProject) {
       setProject(foundProject);
       fetchProjectTasks(foundProject.id);
     } else {
-      // Navigate to 404 if project not found
       navigate("/not-found");
     }
   }, [id, navigate]);
@@ -286,30 +282,58 @@ const ProjectDetails = () => {
       year: "numeric",
     }).format(date);
   };
+
   const handleEditProject = (projectId: string) => {
-    // Code pour éditer le projet
+    toast({
+      title: "Modification en cours",
+      description: `Modification du projet ${project.name}`,
+    });
     console.log(`Édition du projet ${projectId}`);
   };
+
   const handleExportProject = (projectId: string) => {
-    // Code pour exporter le projet en PDF
+    toast({
+      title: "Exportation réussie",
+      description: `Le projet ${project.name} a été exporté en PDF`,
+    });
     console.log(`Exportation du projet ${projectId} en PDF`);
   };
+
   const handleArchiveProject = (projectId: string) => {
-    // Code pour archiver le projet
+    toast({
+      title: "Projet archivé",
+      description: `Le projet ${project.name} a été archivé avec succès`,
+    });
     console.log(`Archivage du projet ${projectId}`);
   };
+
   const handleShareProject = (projectId: string) => {
-    // Code pour partager le projet
+    toast({
+      title: "Partage réussi",
+      description: `Lien de partage pour ${project.name} copié dans le presse-papier`,
+    });
     console.log(`Partage du projet ${projectId}`);
   };
+
   const handleDuplicateProject = (projectId: string) => {
-    // Code pour dupliquer le projet
+    toast({
+      title: "Duplication réussie",
+      description: `Une copie de ${project.name} a été créée`,
+    });
     console.log(`Duplication du projet ${projectId}`);
   };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  const handleNavigateToTasksPage = () => {
+    navigate(`/tasks?project=${project.id}`);
+  };
+
   return (
     <MainLayout>
       <div className="relative">
-        {/* Project header with image background */}
         <div className="h-48 md:h-64 rounded-lg overflow-hidden mb-16">
           <div
             className="w-full h-full bg-gradient-to-r from-architect-700 to-architect-900 relative"
@@ -331,34 +355,33 @@ const ProjectDetails = () => {
                 </div>
                 <div className="flex gap-2">
                 <Button variant="secondary" onClick={() => handleEditProject(project.id)}>
-  <Pencil className="h-4 w-4 mr-2" />
-  Modifier
-</Button>
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="secondary" size="icon">
-      <MoreHorizontal className="h-4 w-4" />
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end">
-    <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>Dupliquer le projet</DropdownMenuItem>
-    <DropdownMenuItem onClick={() => handleExportProject(project.id)}>Exporter en PDF</DropdownMenuItem>
-    <DropdownMenuItem onClick={() => handleShareProject(project.id)}>Partager</DropdownMenuItem>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem className="text-destructive" onClick={() => handleArchiveProject(project.id)}>Archiver</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="secondary" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>Dupliquer le projet</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportProject(project.id)}>Exporter en PDF</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShareProject(project.id)}>Partager</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive" onClick={() => handleArchiveProject(project.id)}>Archiver</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Status badge and progress */}
         <div className="absolute top-36 md:top-52 left-6 bg-white dark:bg-background rounded-lg shadow-lg p-4 border">
           <div className="flex flex-col items-center">
-            <Badge className={`${statusConfig[project.status].color} text-white px-2.5 py-1 text-xs mb-3`}>
-              {statusConfig[project.status].label}
+            <Badge className={`${statusConfig[project.status as keyof typeof statusConfig].color} text-white px-2.5 py-1 text-xs mb-3`}>
+              {statusConfig[project.status as keyof typeof statusConfig].label}
             </Badge>
             <div className="flex items-center gap-1.5 text-sm font-medium">
               <span>{project.progress}%</span>
@@ -368,7 +391,6 @@ const ProjectDetails = () => {
         </div>
       </div>
       
-      {/* Project information cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader className="pb-2">
@@ -474,8 +496,7 @@ const ProjectDetails = () => {
         </Card>
       </div>
       
-      {/* Project tabs for detailed content */}
-      <Tabs defaultValue="overview" className="mb-8">
+      <Tabs defaultValue="overview" className="mb-8" value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Aperçu</TabsTrigger>
           <TabsTrigger value="tasks">Tâches</TabsTrigger>
@@ -484,7 +505,6 @@ const ProjectDetails = () => {
           <TabsTrigger value="milestones">Jalons</TabsTrigger>
         </TabsList>
         
-        {/* Overview Tab */}
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-6">
@@ -492,13 +512,18 @@ const ProjectDetails = () => {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-base">Tâches récentes</CardTitle>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${id}/tasks`)}>
+                    <Button variant="ghost" size="sm" onClick={handleNavigateToTasksPage}>
                       Voir tout
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <TaskList tasks={projectTasks.slice(0, 3)} title="Tâches récentes" />
+                  <TaskList 
+                    tasks={projectTasks.slice(0, 3)} 
+                    title="Tâches récentes"
+                    onCompleteTask={() => {}}
+                    onDeleteTask={() => {}}
+                  />
                 </CardContent>
               </Card>
               
@@ -625,28 +650,31 @@ const ProjectDetails = () => {
           </div>
         </TabsContent>
         
-        {/* Tasks Tab */}
         <TabsContent value="tasks">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between">
-              <div>
-                <CardTitle>Tâches</CardTitle>
-                <CardDescription>Gérez les tâches du projet</CardDescription>
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between">
+                <div>
+                  <CardTitle>Tâches</CardTitle>
+                  <CardDescription>Gérez les tâches du projet</CardDescription>
+                </div>
+                <Button onClick={handleNavigateToTasksPage}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouvelle tâche
+                </Button>
               </div>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvelle tâche
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <TaskList tasks={tasks} title="Toutes les tâches" />
-          </CardContent>
-        </Card>
-      </TabsContent>
+            </CardHeader>
+            <CardContent>
+              <TaskList 
+                tasks={tasks} 
+                title="Toutes les tâches"
+                onCompleteTask={() => {}} 
+                onDeleteTask={() => {}}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
         
-        {/* Team Tab */}
         <TabsContent value="team">
           <Card>
             <CardHeader>
@@ -655,7 +683,7 @@ const ProjectDetails = () => {
                   <CardTitle>Équipe</CardTitle>
                   <CardDescription>Membres de l'équipe travaillant sur ce projet</CardDescription>
                 </div>
-                <Button>
+                <Button onClick={() => navigate('/team')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter un membre
                 </Button>
@@ -672,7 +700,7 @@ const ProjectDetails = () => {
                     <h3 className="font-semibold text-lg">{member.name}</h3>
                     <p className="text-muted-foreground">{member.role}</p>
                     <div className="mt-4 flex gap-2">
-                      <Button variant="outline" size="sm">Profil</Button>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/team/${member.id}`)}>Profil</Button>
                       <Button variant="outline" size="sm">Message</Button>
                     </div>
                   </div>
@@ -682,7 +710,6 @@ const ProjectDetails = () => {
           </Card>
         </TabsContent>
         
-        {/* Documents Tab */}
         <TabsContent value="documents">
           <Card>
             <CardHeader>
@@ -692,11 +719,11 @@ const ProjectDetails = () => {
                   <CardDescription>Tous les documents liés au projet</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={() => navigate('/documents')}>
                     <FileText className="h-4 w-4 mr-2" />
                     Importer
                   </Button>
-                  <Button>
+                  <Button onClick={() => navigate('/documents')}>
                     <Plus className="h-4 w-4 mr-2" />
                     Nouveau document
                   </Button>
@@ -723,7 +750,12 @@ const ProjectDetails = () => {
                         <td className="py-3 px-4">{doc.size}</td>
                         <td className="py-3 px-4">{formatDate(doc.date)}</td>
                         <td className="py-3 px-4 text-right">
-                          <Button variant="ghost" size="sm">Télécharger</Button>
+                          <Button variant="ghost" size="sm" onClick={() => toast({
+                            title: "Téléchargement démarré",
+                            description: `${doc.name} est en cours de téléchargement`
+                          })}>
+                            Télécharger
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -734,7 +766,6 @@ const ProjectDetails = () => {
           </Card>
         </TabsContent>
         
-        {/* Milestones Tab */}
         <TabsContent value="milestones">
           <Card>
             <CardHeader>
@@ -743,7 +774,10 @@ const ProjectDetails = () => {
                   <CardTitle>Jalons</CardTitle>
                   <CardDescription>Suivez les étapes clés du projet</CardDescription>
                 </div>
-                <Button>
+                <Button onClick={() => toast({
+                  title: "Nouveau jalon",
+                  description: "Fonctionnalité en cours de développement"
+                })}>
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter un jalon
                 </Button>
@@ -753,12 +787,10 @@ const ProjectDetails = () => {
               <div className="relative pl-8">
                 {projectMilestones.map((milestone, index) => (
                   <div key={milestone.id} className="mb-8 relative">
-                    {/* Timeline connector */}
                     {index < projectMilestones.length - 1 && (
                       <div className="absolute left-[-16px] top-3 w-[2px] h-full bg-gray-200"></div>
                     )}
                     
-                    {/* Timeline marker */}
                     <div className={`absolute left-[-20px] top-1 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
                       milestone.completed ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-gray-300 text-gray-500'
                     }`}>
@@ -771,7 +803,6 @@ const ProjectDetails = () => {
                       )}
                     </div>
                     
-                    {/* Milestone content */}
                     <div className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-medium text-lg">{milestone.title}</h3>
@@ -785,9 +816,19 @@ const ProjectDetails = () => {
                       </p>
                       
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">Détails</Button>
+                        <Button variant="outline" size="sm" onClick={() => toast({
+                          title: "Détails du jalon",
+                          description: `Affichage des détails pour ${milestone.title}`
+                        })}>
+                          Détails
+                        </Button>
                         {!milestone.completed && (
-                          <Button variant="outline" size="sm">Marquer comme terminé</Button>
+                          <Button variant="outline" size="sm" onClick={() => toast({
+                            title: "Jalon terminé",
+                            description: `${milestone.title} a été marqué comme terminé`
+                          })}>
+                            Marquer comme terminé
+                          </Button>
                         )}
                       </div>
                     </div>
