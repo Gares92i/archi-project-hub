@@ -1,15 +1,13 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import TaskList, { Task } from "@/components/TaskList";
+import TaskList from "@/components/TaskList";
 import { Plus, Search, Filter, Calendar, Clock, CheckCircle, AlertCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -20,135 +18,144 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
-// Données de démonstration pour les tâches
-const tasksData: Task[] = [
-  {
-    id: "1",
-    title: "Finaliser les plans d'étage pour Villa Moderna",
-    projectName: "Villa Moderna",
-    dueDate: "2023-06-30",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: "2",
-    title: "Réviser le cahier des charges pour Tour Horizon",
-    projectName: "Tour Horizon",
-    dueDate: "2023-06-25",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: "3",
-    title: "Préparer la présentation client pour Résidence Eterna",
-    projectName: "Résidence Eterna",
-    dueDate: "2023-06-24",
-    priority: "low",
-    completed: true,
-  },
-  {
-    id: "4",
-    title: "Soumettre les permis de construire pour Centre Commercial Lumina",
-    projectName: "Centre Commercial Lumina",
-    dueDate: "2023-06-28",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: "5",
-    title: "Étudier les contraintes du terrain pour Bureaux Panorama",
-    projectName: "Bureaux Panorama",
-    dueDate: "2023-07-05",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: "6",
-    title: "Coordonner avec l'ingénieur structure pour École Futura",
-    projectName: "École Futura",
-    dueDate: "2023-07-10",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: "7",
-    title: "Analyser les devis des sous-traitants pour Hôtel Riviera",
-    projectName: "Hôtel Riviera",
-    dueDate: "2023-07-02",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: "8",
-    title: "Finaliser les plans de plomberie pour Villa Moderna",
-    projectName: "Villa Moderna",
-    dueDate: "2023-06-29",
-    priority: "low",
-    completed: false,
-  },
-  {
-    id: "9",
-    title: "Valider les choix de matériaux pour Tour Horizon",
-    projectName: "Tour Horizon",
-    dueDate: "2023-07-08",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: "10",
-    title: "Ajuster le planning prévisionnel pour Résidence Eterna",
-    projectName: "Résidence Eterna",
-    dueDate: "2023-06-26",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: "11",
-    title: "Mettre à jour les rendus 3D pour Villa Moderna",
-    projectName: "Villa Moderna",
-    dueDate: "2023-07-15",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: "12",
-    title: "Finaliser le dossier administratif de Complexe Sportif Olympia",
-    projectName: "Complexe Sportif Olympia",
-    dueDate: "2023-07-03",
-    priority: "high",
-    completed: false,
-  },
-];
+import { Task } from "@/components/gantt/types";
+import { getAllTasks, addTask, toggleTaskCompletion } from "@/components/services/taskService";
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[]>(tasksData);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [isNewTaskSheetOpen, setIsNewTaskSheetOpen] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [selectedPriority, setSelectedPriority] = useState<string>("");
 
-  const handleCompleteTask = (id: string, completed: boolean) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed } : task
-    ));
+  // Formulaire pour nouvelle tâche
+  const [newTaskData, setNewTaskData] = useState({
+    title: "",
+    projectId: "",
+    projectName: "",
+    dueDate: "",
+    priority: "medium" as "low" | "medium" | "high",
+    description: ""
+  });
+
+  // Charger les tâches
+  useEffect(() => {
+    const loadTasks = async () => {
+      setIsLoading(true);
+      try {
+        const allTasks = await getAllTasks();
+        setTasks(allTasks);
+        setFilteredTasks(allTasks);
+      } catch (error) {
+        console.error("Erreur lors du chargement des tâches:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTasks();
+  }, []);
+
+  // Filtrer les tâches
+  useEffect(() => {
+    let results = tasks;
+    
+    // Filtre de recherche
+    if (searchQuery) {
+      results = results.filter(task => 
+        (task.title?.toLowerCase().includes(searchQuery.toLowerCase())) || 
+        (task.name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (task.projectName?.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+    
+    // Filtre par projet
+    if (selectedProject) {
+      results = results.filter(task => task.projectId === selectedProject);
+    }
+    
+    // Filtre par priorité
+    if (selectedPriority) {
+      results = results.filter(task => task.priority === selectedPriority);
+    }
+    
+    setFilteredTasks(results);
+  }, [tasks, searchQuery, selectedProject, selectedPriority]);
+
+  const handleCompleteTask = async (id: string, completed: boolean) => {
+    try {
+      await toggleTaskCompletion(id, completed);
+      setTasks(tasks.map(task => 
+        task.id === id ? { ...task, completed } : task
+      ));
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tâche:", error);
+    }
   };
 
-  const handleCreateTask = () => {
-    // Dans une application réelle, nous prendrions ici les données du formulaire
-    // et les soumettrions à une API
-    toast({
-      title: "Tâche créée",
-      description: "La nouvelle tâche a été créée avec succès",
-    });
-    setIsNewTaskSheetOpen(false);
+  const handleDeleteTask = (id: string) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const handleCreateTask = async () => {
+    try {
+      // Trouver le nom du projet à partir de l'ID
+      const projectName = newTaskData.projectId === "1" ? "Villa Moderna" : 
+                         newTaskData.projectId === "2" ? "Tour Horizon" :
+                         newTaskData.projectId === "3" ? "Résidence Eterna" :
+                         newTaskData.projectId === "4" ? "Centre Commercial Lumina" :
+                         newTaskData.projectId === "5" ? "Bureaux Panorama" :
+                         newTaskData.projectId === "6" ? "École Futura" :
+                         newTaskData.projectId === "7" ? "Hôtel Riviera" :
+                         newTaskData.projectId === "8" ? "Complexe Sportif Olympia" : "";
+      
+      // Calculer les dates de début et de fin
+      const dueDate = newTaskData.dueDate;
+      const startDate = new Date(dueDate);
+      startDate.setDate(startDate.getDate() - 5); // 5 jours avant la date d'échéance
+      
+      const newTaskPayload = {
+        title: newTaskData.title,
+        name: newTaskData.title,
+        projectId: newTaskData.projectId,
+        projectName: projectName,
+        dueDate: dueDate,
+        start: startDate.toISOString().split('T')[0],
+        end: dueDate,
+        priority: newTaskData.priority,
+        completed: false,
+        progress: 0
+      };
+      
+      const createdTask = await addTask(newTaskPayload);
+      setTasks(prevTasks => [...prevTasks, createdTask]);
+      
+      // Réinitialiser le formulaire
+      setNewTaskData({
+        title: "",
+        projectId: "",
+        projectName: "",
+        dueDate: "",
+        priority: "medium",
+        description: ""
+      });
+      
+      setIsNewTaskSheetOpen(false);
+    } catch (error) {
+      console.error("Erreur lors de la création de la tâche:", error);
+    }
   };
 
   // Filtrer les tâches pour différentes vues
-  const pendingTasks = tasks.filter(task => !task.completed);
-  const completedTasks = tasks.filter(task => task.completed);
-  const highPriorityTasks = tasks.filter(task => task.priority === 'high' && !task.completed);
+  const pendingTasks = filteredTasks.filter(task => !task.completed);
+  const completedTasks = filteredTasks.filter(task => task.completed);
+  const highPriorityTasks = filteredTasks.filter(task => task.priority === 'high' && !task.completed);
   
   // Calcul des tâches en retard
-  const overdueTasks = tasks.filter(task => {
+  const overdueTasks = filteredTasks.filter(task => {
+    if (!task.dueDate) return false;
     const dueDate = new Date(task.dueDate);
     const now = new Date();
     return dueDate < now && !task.completed;
@@ -234,37 +241,53 @@ const Tasks = () => {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher une tâche..." className="pl-9" />
+              <Input 
+                placeholder="Rechercher une tâche..." 
+                className="pl-9" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Select>
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Tous les projets" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les projets</SelectItem>
-                  <SelectItem value="villa-moderna">Villa Moderna</SelectItem>
-                  <SelectItem value="tour-horizon">Tour Horizon</SelectItem>
-                  <SelectItem value="residence-eterna">Résidence Eterna</SelectItem>
-                  <SelectItem value="centre-commercial">Centre Commercial Lumina</SelectItem>
+                  <SelectItem value="">Tous les projets</SelectItem>
+                  <SelectItem value="1">Villa Moderna</SelectItem>
+                  <SelectItem value="2">Tour Horizon</SelectItem>
+                  <SelectItem value="3">Résidence Eterna</SelectItem>
+                  <SelectItem value="4">Centre Commercial Lumina</SelectItem>
+                  <SelectItem value="5">Bureaux Panorama</SelectItem>
+                  <SelectItem value="6">École Futura</SelectItem>
+                  <SelectItem value="7">Hôtel Riviera</SelectItem>
+                  <SelectItem value="8">Complexe Sportif Olympia</SelectItem>
                 </SelectContent>
               </Select>
               
-              <Select>
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Toutes les priorités" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes les priorités</SelectItem>
+                  <SelectItem value="">Toutes les priorités</SelectItem>
                   <SelectItem value="high">Haute</SelectItem>
                   <SelectItem value="medium">Moyenne</SelectItem>
                   <SelectItem value="low">Faible</SelectItem>
                 </SelectContent>
               </Select>
               
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedProject("");
+                  setSelectedPriority("");
+                }}
+              >
                 <Filter className="h-4 w-4 mr-2" />
-                Plus de filtres
+                Réinitialiser
               </Button>
             </div>
           </div>
@@ -281,9 +304,10 @@ const Tasks = () => {
         
         <TabsContent value="all">
           <TaskList 
-            tasks={tasks} 
+            tasks={filteredTasks} 
             title="Toutes les tâches" 
             onCompleteTask={handleCompleteTask}
+            onDeleteTask={handleDeleteTask}
           />
         </TabsContent>
         
@@ -292,6 +316,7 @@ const Tasks = () => {
             tasks={pendingTasks} 
             title="Tâches à faire" 
             onCompleteTask={handleCompleteTask}
+            onDeleteTask={handleDeleteTask}
           />
         </TabsContent>
         
@@ -300,6 +325,7 @@ const Tasks = () => {
             tasks={completedTasks} 
             title="Tâches terminées" 
             onCompleteTask={handleCompleteTask}
+            onDeleteTask={handleDeleteTask}
           />
         </TabsContent>
         
@@ -308,6 +334,7 @@ const Tasks = () => {
             tasks={overdueTasks} 
             title="Tâches en retard" 
             onCompleteTask={handleCompleteTask}
+            onDeleteTask={handleDeleteTask}
           />
         </TabsContent>
       </Tabs>
@@ -324,30 +351,49 @@ const Tasks = () => {
           <div className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="task-title">Titre de la tâche</Label>
-              <Input id="task-title" placeholder="Entrez le titre de la tâche" />
+              <Input 
+                id="task-title" 
+                placeholder="Entrez le titre de la tâche"
+                value={newTaskData.title}
+                onChange={(e) => setNewTaskData({...newTaskData, title: e.target.value})}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="project-name">Projet associé</Label>
-              <Select>
+              <Select 
+                value={newTaskData.projectId} 
+                onValueChange={(value) => setNewTaskData({...newTaskData, projectId: value})}
+              >
                 <SelectTrigger id="project-name">
                   <SelectValue placeholder="Sélectionner un projet" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="villa-moderna">Villa Moderna</SelectItem>
-                  <SelectItem value="tour-horizon">Tour Horizon</SelectItem>
-                  <SelectItem value="residence-eterna">Résidence Eterna</SelectItem>
-                  <SelectItem value="centre-commercial">Centre Commercial Lumina</SelectItem>
-                  <SelectItem value="bureaux-panorama">Bureaux Panorama</SelectItem>
+                  <SelectItem value="1">Villa Moderna</SelectItem>
+                  <SelectItem value="2">Tour Horizon</SelectItem>
+                  <SelectItem value="3">Résidence Eterna</SelectItem>
+                  <SelectItem value="4">Centre Commercial Lumina</SelectItem>
+                  <SelectItem value="5">Bureaux Panorama</SelectItem>
+                  <SelectItem value="6">École Futura</SelectItem>
+                  <SelectItem value="7">Hôtel Riviera</SelectItem>
+                  <SelectItem value="8">Complexe Sportif Olympia</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="due-date">Date d'échéance</Label>
-              <Input id="due-date" type="date" />
+              <Input 
+                id="due-date" 
+                type="date"
+                value={newTaskData.dueDate}
+                onChange={(e) => setNewTaskData({...newTaskData, dueDate: e.target.value})}
+              />
             </div>
             <div className="space-y-2">
               <Label>Priorité</Label>
-              <RadioGroup defaultValue="medium">
+              <RadioGroup 
+                value={newTaskData.priority}
+                onValueChange={(value) => setNewTaskData({...newTaskData, priority: value as "low" | "medium" | "high"})}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="low" id="low" />
                   <Label htmlFor="low">Faible</Label>
@@ -364,12 +410,22 @@ const Tasks = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="task-description">Description (optionnelle)</Label>
-              <Input id="task-description" placeholder="Description de la tâche" />
+              <Input 
+                id="task-description" 
+                placeholder="Description de la tâche"
+                value={newTaskData.description}
+                onChange={(e) => setNewTaskData({...newTaskData, description: e.target.value})}
+              />
             </div>
           </div>
           <SheetFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsNewTaskSheetOpen(false)}>Annuler</Button>
-            <Button onClick={handleCreateTask}>Créer la tâche</Button>
+            <Button 
+              onClick={handleCreateTask}
+              disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.dueDate}
+            >
+              Créer la tâche
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

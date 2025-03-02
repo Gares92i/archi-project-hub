@@ -1,10 +1,16 @@
 
 export interface Task {
   id: string;
+  title: string;
   name: string;
   start: string;
   end: string;
   progress: number;
+  projectId?: string;
+  projectName?: string;
+  dueDate?: string;
+  priority?: "low" | "medium" | "high";
+  completed?: boolean;
 }
 
 export interface Project {
@@ -22,5 +28,3 @@ export interface ChartTask {
   startPosition: number;
   duration: number;
 }
-
-// dhtmlx-gantt handles drag state internally now

@@ -1,17 +1,33 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { addDays, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { Project, ChartTask, Task } from "./types";
-import { toast } from "sonner";
+import { getTasksByProjectId, updateTaskDates } from "@/components/services/taskService";
 
 export const useGanttData = (currentProject: Project) => {
   const [chartData, setChartData] = useState<ChartTask[]>([]);
-  const [tasks, setTasks] = useState<Task[]>(currentProject.tasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchTasks = useCallback(async () => {
+    try {
+      setLoading(true);
+      const projectTasks = await getTasksByProjectId(currentProject.id);
+      setTasks(projectTasks);
+    } catch (error) {
+      console.error("Erreur lors du chargement des tâches:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentProject.id]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const formatTasksForChart = useCallback((projectTasks: Task[]) => {
     return projectTasks.map(task => ({
       id: task.id,
-      name: task.name,
+      name: task.name || task.title || "",
       start: new Date(task.start).getTime(),
       end: new Date(task.end).getTime(),
       progress: task.progress,
@@ -19,11 +35,6 @@ export const useGanttData = (currentProject: Project) => {
       duration: Math.ceil((new Date(task.end).getTime() - new Date(task.start).getTime()) / (1000 * 60 * 60 * 24)) + 1
     }));
   }, []);
-
-  useEffect(() => {
-    // Reset the tasks when the current project changes
-    setTasks(currentProject.tasks);
-  }, [currentProject]);
 
   useEffect(() => {
     if (!tasks.length) {
@@ -35,23 +46,20 @@ export const useGanttData = (currentProject: Project) => {
     setChartData(formattedData);
   }, [tasks, formatTasksForChart]);
 
-  const updateTask = useCallback((taskId: string, newStart: Date, newEnd: Date) => {
-    console.log("Updating task:", taskId, newStart, newEnd);
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId 
-          ? { 
-              ...task, 
-              start: newStart.toISOString().split('T')[0], 
-              end: newEnd.toISOString().split('T')[0] 
-            } 
-          : task
-      )
-    );
-    
-    // Show confirmation to user
-    toast.success(`Task updated successfully`);
+  const updateTask = useCallback(async (taskId: string, newStart: Date, newEnd: Date) => {
+    try {
+      console.log("Updating task:", taskId, newStart, newEnd);
+      const updatedTask = await updateTaskDates(taskId, newStart, newEnd);
+      
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tâche:", error);
+    }
   }, []);
 
-  return { chartData, tasks, updateTask };
+  return { chartData, tasks, updateTask, loading, refreshTasks: fetchTasks };
 };

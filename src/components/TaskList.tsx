@@ -11,20 +11,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-export interface Task {
-  id: string;
-  title: string;
-  projectName: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  completed: boolean;
-}
+import { Task } from "@/components/gantt/types";
+import { toggleTaskCompletion, deleteTask } from "@/components/services/taskService";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface TaskListProps {
   tasks: Task[];
   title: string;
   onCompleteTask?: (id: string, completed: boolean) => void;
+  onDeleteTask?: (id: string) => void;
 }
 
 const priorityConfig = {
@@ -33,8 +29,11 @@ const priorityConfig = {
   high: { color: "bg-red-500/10 text-red-700 border-red-500/30" },
 };
 
-const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
-  const formatDate = (dateString: string) => {
+const TaskList = ({ tasks, title, onCompleteTask, onDeleteTask }: TaskListProps) => {
+  const [loadingTaskId, setLoadingTaskId] = useState<string | null>(null);
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("fr-FR", { 
       day: "numeric", 
@@ -42,7 +41,8 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
     }).format(date);
   };
   
-  const isOverdue = (dateString: string) => {
+  const isOverdue = (dateString: string | undefined) => {
+    if (!dateString) return false;
     const dueDate = new Date(dateString);
     const now = new Date();
     return dueDate < now && !isToday(dueDate);
@@ -55,9 +55,33 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
       date.getFullYear() === today.getFullYear();
   };
 
-  const handleCheckboxChange = (id: string, checked: boolean) => {
-    if (onCompleteTask) {
-      onCompleteTask(id, checked);
+  const handleCheckboxChange = async (id: string, checked: boolean) => {
+    try {
+      setLoadingTaskId(id);
+      await toggleTaskCompletion(id, checked);
+      if (onCompleteTask) {
+        onCompleteTask(id, checked);
+      }
+    } catch (error) {
+      toast.error("Échec de la mise à jour de la tâche");
+      console.error(error);
+    } finally {
+      setLoadingTaskId(null);
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    try {
+      setLoadingTaskId(id);
+      await deleteTask(id);
+      if (onDeleteTask) {
+        onDeleteTask(id);
+      }
+    } catch (error) {
+      toast.error("Échec de la suppression de la tâche");
+      console.error(error);
+    } finally {
+      setLoadingTaskId(null);
     }
   };
 
@@ -69,12 +93,13 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
       <CardContent className="pt-0">
         <ul className="space-y-3">
           {tasks.map((task) => (
-            <li key={task.id} className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
+            <li key={task.id} className={`flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors ${loadingTaskId === task.id ? 'opacity-70' : ''}`}>
               <Checkbox 
                 id={`task-${task.id}`} 
                 checked={task.completed}
                 onCheckedChange={(checked) => handleCheckboxChange(task.id, checked as boolean)}
                 className="mt-1"
+                disabled={loadingTaskId === task.id}
               />
               
               <div className="flex-1 min-w-0">
@@ -83,12 +108,12 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
                     htmlFor={`task-${task.id}`}
                     className={`font-medium line-clamp-1 ${task.completed ? 'line-through text-muted-foreground' : ''}`}
                   >
-                    {task.title}
+                    {task.title || task.name}
                   </label>
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" disabled={loadingTaskId === task.id}>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -96,7 +121,12 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
                       <DropdownMenuItem>Modifier</DropdownMenuItem>
                       <DropdownMenuItem>Assigner</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="text-destructive"
+                        onClick={() => handleDeleteTask(task.id)}
+                      >
+                        Supprimer
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -105,18 +135,22 @@ const TaskList = ({ tasks, title, onCompleteTask }: TaskListProps) => {
                   <span className="text-xs text-muted-foreground line-clamp-1">{task.projectName}</span>
                   
                   <div className="flex items-center gap-2 ml-auto">
-                    <Badge variant="outline" className={`text-xs px-1.5 py-0 ${priorityConfig[task.priority].color}`}>
-                      {task.priority === 'low' ? 'Faible' : task.priority === 'medium' ? 'Moyenne' : 'Haute'}
-                    </Badge>
+                    {task.priority && (
+                      <Badge variant="outline" className={`text-xs px-1.5 py-0 ${priorityConfig[task.priority].color}`}>
+                        {task.priority === 'low' ? 'Faible' : task.priority === 'medium' ? 'Moyenne' : 'Haute'}
+                      </Badge>
+                    )}
                     
-                    <div 
-                      className={`flex items-center text-xs ${
-                        isOverdue(task.dueDate) ? 'text-destructive' : isToday(new Date(task.dueDate)) ? 'text-yellow-600' : 'text-muted-foreground'
-                      }`}
-                    >
-                      <Clock className="h-3 w-3 mr-1" />
-                      <span>{formatDate(task.dueDate)}</span>
-                    </div>
+                    {task.dueDate && (
+                      <div 
+                        className={`flex items-center text-xs ${
+                          isOverdue(task.dueDate) ? 'text-destructive' : isToday(new Date(task.dueDate)) ? 'text-yellow-600' : 'text-muted-foreground'
+                        }`}
+                      >
+                        <Clock className="h-3 w-3 mr-1" />
+                        <span>{formatDate(task.dueDate)}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
