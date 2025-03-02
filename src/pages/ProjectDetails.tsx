@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
@@ -32,7 +31,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProjectCardProps } from "@/components/ProjectCard";
-import TaskList, { Task } from "@/components/TaskList";
+import TaskList from "@/components/TaskList";
+import { Task } from "@/components/gantt/types";
 
 // Mock projects data for demonstration
 const projectsData: ProjectCardProps[] = [

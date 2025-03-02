@@ -50,7 +50,8 @@ const GanttChart = () => {
         const endDate = new Date(task.end_date);
         
         // Call our updateTask function to persist the changes
-        updateTask(id, startDate, endDate);
+        // Add progress as third parameter to match function signature
+        updateTask(id, startDate, endDate, task.progress);
         toast.success("Tâche mise à jour avec succès");
         return true;
       });
