@@ -9,6 +9,7 @@ import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
 import { Task } from "@/components/gantt/types";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 const GanttChart = () => {
   const [selectedProject, setSelectedProject] = useState(projectsData[0].id);
@@ -50,6 +51,7 @@ const GanttChart = () => {
         
         // Call our updateTask function to persist the changes
         updateTask(id, startDate, endDate);
+        toast.success("Tâche mise à jour avec succès");
         return true;
       });
       

@@ -1,4 +1,3 @@
-
 import { CalendarClock, CheckCircle, Clock, LineChart, Activity, AlertCircle } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,34 +16,50 @@ const recentTasks = [
   {
     id: "1",
     title: "Finaliser les plans d'étage pour Villa Moderna",
+    name: "Finaliser les plans d'étage pour Villa Moderna",
     projectName: "Villa Moderna",
     dueDate: "2023-06-30",
     priority: "high" as const,
     completed: false,
+    start: "2023-06-20",
+    end: "2023-06-30",
+    progress: 60
   },
   {
     id: "2",
     title: "Réviser le cahier des charges pour Tour Horizon",
+    name: "Réviser le cahier des charges pour Tour Horizon",
     projectName: "Tour Horizon",
     dueDate: "2023-06-25",
     priority: "medium" as const,
     completed: false,
+    start: "2023-06-15",
+    end: "2023-06-25",
+    progress: 30
   },
   {
     id: "3",
     title: "Préparer la présentation client pour Résidence Eterna",
+    name: "Préparer la présentation client pour Résidence Eterna",
     projectName: "Résidence Eterna",
     dueDate: "2023-06-24",
     priority: "low" as const,
     completed: true,
+    start: "2023-06-10",
+    end: "2023-06-24",
+    progress: 100
   },
   {
     id: "4",
     title: "Soumettre les permis de construire pour Centre Commercial Lumina",
+    name: "Soumettre les permis de construire pour Centre Commercial Lumina",
     projectName: "Centre Commercial Lumina",
     dueDate: "2023-06-28",
     priority: "high" as const,
     completed: false,
+    start: "2023-06-15",
+    end: "2023-06-28",
+    progress: 40
   },
 ];
 

@@ -28,3 +28,11 @@ export interface ChartTask {
   startPosition: number;
   duration: number;
 }
+
+export interface DragState {
+  taskId: string | null;
+  originalStart: number | null;
+  originalEnd: number | null;
+  startPosition: number | null;
+  type: 'move' | 'resize-start' | 'resize-end' | null;
+}
