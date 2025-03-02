@@ -18,8 +18,8 @@ const Tasks = () => {
   const [isNewTaskSheetOpen, setIsNewTaskSheetOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProject, setSelectedProject] = useState<string>("");
-  const [selectedPriority, setSelectedPriority] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<string>("all");
+  const [selectedPriority, setSelectedPriority] = useState<string>("all");
 
   // Charger les tâches
   useEffect(() => {
@@ -53,12 +53,12 @@ const Tasks = () => {
     }
     
     // Filtre par projet
-    if (selectedProject) {
+    if (selectedProject && selectedProject !== "all") {
       results = results.filter(task => task.projectId === selectedProject);
     }
     
     // Filtre par priorité
-    if (selectedPriority) {
+    if (selectedPriority && selectedPriority !== "all") {
       results = results.filter(task => task.priority === selectedPriority);
     }
     
@@ -96,6 +96,12 @@ const Tasks = () => {
     const now = new Date();
     return dueDate < now && !task.completed;
   });
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSelectedProject("all");
+    setSelectedPriority("all");
+  };
 
   return (
     <MainLayout>

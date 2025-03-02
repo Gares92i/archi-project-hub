@@ -44,7 +44,7 @@ const TaskFilters = ({
             <SelectValue placeholder="Tous les projets" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les projets</SelectItem>
+            <SelectItem value="all">Tous les projets</SelectItem>
             <SelectItem value="1">Villa Moderna</SelectItem>
             <SelectItem value="2">Tour Horizon</SelectItem>
             <SelectItem value="3">Résidence Eterna</SelectItem>
@@ -61,7 +61,7 @@ const TaskFilters = ({
             <SelectValue placeholder="Toutes les priorités" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes les priorités</SelectItem>
+            <SelectItem value="all">Toutes les priorités</SelectItem>
             <SelectItem value="high">Haute</SelectItem>
             <SelectItem value="medium">Moyenne</SelectItem>
             <SelectItem value="low">Faible</SelectItem>
