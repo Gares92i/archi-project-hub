@@ -46,9 +46,9 @@ export const useGanttData = (currentProject: Project) => {
     setChartData(formattedData);
   }, [tasks, formatTasksForChart]);
 
-  const updateTask = useCallback(async (taskId: string, newStart: Date, newEnd: Date) => {
+  const updateTask = useCallback(async (taskId: string, newStart: Date, newEnd: Date, progress: number) => {
     try {
-      console.log("Updating task:", taskId, newStart, newEnd);
+      console.log("Updating task:", taskId, newStart, newEnd, progress);
       const updatedTask = await updateTaskDates(taskId, newStart, newEnd);
       
       setTasks(prevTasks => 
