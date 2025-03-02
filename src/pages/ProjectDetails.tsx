@@ -21,6 +21,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { getTasksByProjectId } from "@/components/services/taskService";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -224,18 +225,29 @@ const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<ProjectCardProps | null>(null);
-  
+  const [tasks, setTasks] = useState<Task[]>([]);
+
   useEffect(() => {
     // Simulate API call to fetch project details
     const foundProject = projectsData.find(p => p.id === id);
     if (foundProject) {
       setProject(foundProject);
+      fetchProjectTasks(foundProject.id);
     } else {
       // Navigate to 404 if project not found
       navigate("/not-found");
     }
   }, [id, navigate]);
-  
+
+  const fetchProjectTasks = async (projectId: string) => {
+    try {
+      const projectTasks = await getTasksByProjectId(projectId);
+      setTasks(projectTasks);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches du projet :", error);
+    }
+  };
+
   if (!project) {
     return (
       <MainLayout>
@@ -254,13 +266,32 @@ const ProjectDetails = () => {
       year: "numeric",
     }).format(date);
   };
-  
+  const handleEditProject = (projectId: string) => {
+    // Code pour éditer le projet
+    console.log(`Édition du projet ${projectId}`);
+  };
+  const handleExportProject = (projectId: string) => {
+    // Code pour exporter le projet en PDF
+    console.log(`Exportation du projet ${projectId} en PDF`);
+  };
+  const handleArchiveProject = (projectId: string) => {
+    // Code pour archiver le projet
+    console.log(`Archivage du projet ${projectId}`);
+  };
+  const handleShareProject = (projectId: string) => {
+    // Code pour partager le projet
+    console.log(`Partage du projet ${projectId}`);
+  };
+  const handleDuplicateProject = (projectId: string) => {
+    // Code pour dupliquer le projet
+    console.log(`Duplication du projet ${projectId}`);
+  };
   return (
     <MainLayout>
       <div className="relative">
         {/* Project header with image background */}
         <div className="h-48 md:h-64 rounded-lg overflow-hidden mb-16">
-          <div 
+          <div
             className="w-full h-full bg-gradient-to-r from-architect-700 to-architect-900 relative"
             style={
               project.imageUrl 
@@ -279,24 +310,24 @@ const ProjectDetails = () => {
                   <p className="text-white/80">{project.client}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="secondary">
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Modifier
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="secondary" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Dupliquer le projet</DropdownMenuItem>
-                      <DropdownMenuItem>Exporter en PDF</DropdownMenuItem>
-                      <DropdownMenuItem>Partager</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">Archiver</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <Button variant="secondary" onClick={() => handleEditProject(project.id)}>
+  <Pencil className="h-4 w-4 mr-2" />
+  Modifier
+</Button>
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="secondary" size="icon">
+      <MoreHorizontal className="h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>Dupliquer le projet</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => handleExportProject(project.id)}>Exporter en PDF</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => handleShareProject(project.id)}>Partager</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem className="text-destructive" onClick={() => handleArchiveProject(project.id)}>Archiver</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
                 </div>
               </div>
             </div>
@@ -576,24 +607,24 @@ const ProjectDetails = () => {
         
         {/* Tasks Tab */}
         <TabsContent value="tasks">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between">
-                <div>
-                  <CardTitle>Tâches</CardTitle>
-                  <CardDescription>Gérez les tâches du projet</CardDescription>
-                </div>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nouvelle tâche
-                </Button>
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between">
+              <div>
+                <CardTitle>Tâches</CardTitle>
+                <CardDescription>Gérez les tâches du projet</CardDescription>
               </div>
-            </CardHeader>
-            <CardContent>
-              <TaskList tasks={projectTasks} title="Toutes les tâches" />
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvelle tâche
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <TaskList tasks={tasks} title="Toutes les tâches" />
+          </CardContent>
+        </Card>
+      </TabsContent>
         
         {/* Team Tab */}
         <TabsContent value="team">
