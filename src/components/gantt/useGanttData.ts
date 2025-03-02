@@ -49,6 +49,7 @@ export const useGanttData = (currentProject: Project) => {
   const updateTask = useCallback(async (taskId: string, newStart: Date, newEnd: Date, progress: number) => {
     try {
       console.log("Updating task:", taskId, newStart, newEnd, progress);
+      // Ensure we're passing the right parameters to updateTaskDates
       const updatedTask = await updateTaskDates(taskId, newStart, newEnd);
       
       // Update the progress separately if needed

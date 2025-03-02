@@ -4,15 +4,62 @@ import MainLayout from "@/components/layout/MainLayout";
 import GanttChartComponent from "@/components/gantt/GanttChartComponent";
 import ProjectSelector from "@/components/gantt/ProjectSelector";
 import { useGanttData } from "@/components/gantt/useGanttData";
-import { Task } from "@/components/gantt/types";
-import { updateTask } from "@/components/services/taskService";
+import { Task, Project } from "@/components/gantt/types";
+import { getAllTasks } from "@/components/services/taskService";
 import { toast } from "sonner";
+import { addDays, format } from "date-fns";
 
 const GanttChart = () => {
-  const { tasks, isLoading, error } = useGanttData();
+  // Create a default project to pass to useGanttData
+  const defaultProject: Project = { id: "", name: "All Projects", tasks: [] };
+  const { tasks, loading, updateTask } = useGanttData(defaultProject);
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
+  // Generate date range for Gantt chart
+  const today = new Date();
+  const dateRange = Array.from({ length: 30 }, (_, i) => addDays(today, i));
+
+  // Fetch all tasks and extract projects
+  useEffect(() => {
+    const fetchAllTasks = async () => {
+      try {
+        setIsLoading(true);
+        const allTasks = await getAllTasks();
+        
+        // Extract unique projects from tasks
+        const projectMap = new Map<string, Project>();
+        
+        allTasks.forEach(task => {
+          if (task.projectId) {
+            if (!projectMap.has(task.projectId)) {
+              projectMap.set(task.projectId, {
+                id: task.projectId,
+                name: task.projectName || `Project ${task.projectId}`,
+                tasks: []
+              });
+            }
+            projectMap.get(task.projectId)?.tasks.push(task);
+          }
+        });
+        
+        setAllProjects(Array.from(projectMap.values()));
+        setFilteredTasks(allTasks);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+        setError(err instanceof Error ? err : new Error("An unknown error occurred"));
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAllTasks();
+  }, []);
+
+  // Filter tasks when selected project changes
   useEffect(() => {
     if (tasks) {
       if (selectedProject) {
@@ -25,13 +72,16 @@ const GanttChart = () => {
 
   const handleTaskUpdate = async (
     taskId: string, 
-    startDate: string, 
-    endDate: string,
-    task: Task
+    newStart: Date, 
+    newEnd: Date
   ) => {
     try {
-      // Make sure to pass all required arguments: taskId, startDate, endDate, and progress
-      await updateTask(taskId, startDate, endDate, task.progress || 0);
+      // Find the task to get its current progress
+      const task = filteredTasks.find(t => t.id === taskId);
+      const progress = task?.progress || 0;
+      
+      // Call updateTask with all required parameters
+      await updateTask(taskId, newStart, newEnd, progress);
       toast.success("Tâche mise à jour avec succès");
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la tâche:", error);
@@ -49,6 +99,9 @@ const GanttChart = () => {
     );
   }
 
+  const selectedProjectObj = allProjects.find(p => p.id === selectedProject) || 
+                            { name: "Tous les projets" };
+
   return (
     <MainLayout>
       <div className="mb-6">
@@ -60,14 +113,25 @@ const GanttChart = () => {
             </p>
           </div>
           <ProjectSelector 
-            selectedProject={selectedProject}
-            setSelectedProject={setSelectedProject}
+            projects={allProjects}
+            selectedProjectId={selectedProject}
+            onProjectChange={setSelectedProject}
           />
         </div>
         
         <GanttChartComponent 
-          tasks={filteredTasks} 
-          isLoading={isLoading}
+          projectName={selectedProjectObj.name}
+          chartData={filteredTasks.map(task => ({
+            id: task.id,
+            name: task.name || task.title,
+            start: new Date(task.start).getTime(),
+            end: new Date(task.end).getTime(),
+            progress: task.progress,
+            startPosition: 0,
+            duration: Math.ceil((new Date(task.end).getTime() - new Date(task.start).getTime()) / (1000 * 60 * 60 * 24)) + 1
+          }))}
+          dateRange={dateRange}
+          isLoading={loading || isLoading}
           onTaskUpdate={handleTaskUpdate}
         />
       </div>

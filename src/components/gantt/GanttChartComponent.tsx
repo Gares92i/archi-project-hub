@@ -6,11 +6,13 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomTooltip, CustomBar } from "./ChartComponents";
 import { ChartTask, DragState } from "./types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface GanttChartComponentProps {
   projectName: string;
   chartData: ChartTask[];
   dateRange: Date[];
+  isLoading?: boolean;
   onTaskUpdate?: (taskId: string, newStart: Date, newEnd: Date) => void;
 }
 
@@ -18,6 +20,7 @@ const GanttChartComponent = ({
   projectName, 
   chartData, 
   dateRange,
+  isLoading = false,
   onTaskUpdate 
 }: GanttChartComponentProps) => {
   const [dragState, setDragState] = useState<DragState>({
@@ -100,6 +103,21 @@ const GanttChartComponent = ({
       type: null
     });
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-1/3" />
+        </CardHeader>
+        <CardContent>
+          <div className="min-w-[800px] h-[400px]">
+            <Skeleton className="h-full w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

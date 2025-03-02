@@ -234,10 +234,13 @@ export const toggleTaskCompletion = async (id: string, completed: boolean): Prom
 
 // Mettre à jour les dates d'une tâche (pour le Gantt)
 export const updateTaskDates = async (id: string, startDate: Date, endDate: Date): Promise<Task> => {
-  // Calculate the new progress based on current task progress to keep it consistent
+  // Format the dates to ISO string and extract the date part
+  const start = startDate.toISOString().split('T')[0];
+  const end = endDate.toISOString().split('T')[0];
+  
   return updateTask(id, { 
-    start: startDate.toISOString().split('T')[0],
-    end: endDate.toISOString().split('T')[0],
-    dueDate: endDate.toISOString().split('T')[0]
+    start,
+    end,
+    dueDate: end
   });
 };
