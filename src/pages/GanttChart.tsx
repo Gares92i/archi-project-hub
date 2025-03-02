@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { projectsData } from "@/components/gantt/data";
@@ -50,7 +49,7 @@ const GanttChart = () => {
         const endDate = new Date(task.end_date);
         
         // Call our updateTask function to persist the changes
-        updateTask(id, startDate, endDate);
+        updateTask(id, startDate, endDate, task.progress);
         toast.success("Tâche mise à jour avec succès");
         return true;
       });
