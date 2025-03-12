@@ -35,6 +35,7 @@ import TaskList from "@/components/TaskList";
 import { Task } from "@/components/gantt/types";
 import { useToast } from "@/hooks/use-toast";
 import { Document } from "@/components/DocumentsList";
+import DocumentsList from "@/components/DocumentsList";
 
 const projectsData: ProjectCardProps[] = [
   {
@@ -209,11 +210,11 @@ const projectTasks: Task[] = [
 ];
 
 const projectDocuments: Document[] = [
-  { id: "doc1", name: "Plans_architecturaux_v2.pdf", type: "pdf", size: "8.5 MB", date: "2023-03-10" },
-  { id: "doc2", name: "Budget_prévisionnel.xlsx", type: "xls", size: "1.2 MB", date: "2023-02-28" },
-  { id: "doc3", name: "Rendus_3D_facade.jpg", type: "img", size: "5.7 MB", date: "2023-03-15" },
-  { id: "doc4", name: "Contrat_client_signé.pdf", type: "pdf", size: "3.1 MB", date: "2023-01-20" },
-  { id: "doc5", name: "Calendrier_travaux.xlsx", type: "xls", size: "0.9 MB", date: "2023-03-05" },
+  { id: "doc1", name: "Plans_architecturaux_v2.pdf", type: "pdf", projectName: "Villa Moderna", uploadDate: "2023-03-10", size: "8.5 MB" },
+  { id: "doc2", name: "Budget_prévisionnel.xlsx", type: "xls", projectName: "Villa Moderna", uploadDate: "2023-02-28", size: "1.2 MB" },
+  { id: "doc3", name: "Rendus_3D_facade.jpg", type: "img", projectName: "Villa Moderna", uploadDate: "2023-03-15", size: "5.7 MB" },
+  { id: "doc4", name: "Contrat_client_signé.pdf", type: "pdf", projectName: "Villa Moderna", uploadDate: "2023-01-20", size: "3.1 MB" },
+  { id: "doc5", name: "Calendrier_travaux.xlsx", type: "xls", projectName: "Villa Moderna", uploadDate: "2023-03-05", size: "0.9 MB" },
 ];
 
 const projectMilestones = [
@@ -606,7 +607,7 @@ const ProjectDetails = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{doc.name}</p>
-                          <p className="text-xs text-muted-foreground">{doc.size} • {formatDate(doc.date)}</p>
+                          <p className="text-xs text-muted-foreground">{doc.size} • {formatDate(doc.uploadDate)}</p>
                         </div>
                       </div>
                     ))}
@@ -745,102 +746,3 @@ const ProjectDetails = () => {
                   <tbody>
                     {projectDocuments.map(doc => (
                       <tr key={doc.id} className="border-b hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-4 font-medium">{doc.name}</td>
-                        <td className="py-3 px-4">{doc.type.toUpperCase()}</td>
-                        <td className="py-3 px-4">{doc.size}</td>
-                        <td className="py-3 px-4">{formatDate(doc.date)}</td>
-                        <td className="py-3 px-4 text-right">
-                          <Button variant="ghost" size="sm" onClick={() => toast({
-                            title: "Téléchargement démarré",
-                            description: `${doc.name} est en cours de téléchargement`
-                          })}>
-                            Télécharger
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="milestones">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between">
-                <div>
-                  <CardTitle>Jalons</CardTitle>
-                  <CardDescription>Suivez les étapes clés du projet</CardDescription>
-                </div>
-                <Button onClick={() => toast({
-                  title: "Nouveau jalon",
-                  description: "Fonctionnalité en cours de développement"
-                })}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Ajouter un jalon
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="relative pl-8">
-                {projectMilestones.map((milestone, index) => (
-                  <div key={milestone.id} className="mb-8 relative">
-                    {index < projectMilestones.length - 1 && (
-                      <div className="absolute left-[-16px] top-3 w-[2px] h-full bg-gray-200"></div>
-                    )}
-                    
-                    <div className={`absolute left-[-20px] top-1 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                      milestone.completed ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-gray-300 text-gray-500'
-                    }`}>
-                      {milestone.completed ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        <span className="text-xs font-medium">{index + 1}</span>
-                      )}
-                    </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-lg">{milestone.title}</h3>
-                        <Badge variant={milestone.completed ? "default" : "outline"}>
-                          {milestone.completed ? "Terminé" : "À venir"}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {formatDate(milestone.date)}
-                      </p>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => toast({
-                          title: "Détails du jalon",
-                          description: `Affichage des détails pour ${milestone.title}`
-                        })}>
-                          Détails
-                        </Button>
-                        {!milestone.completed && (
-                          <Button variant="outline" size="sm" onClick={() => toast({
-                            title: "Jalon terminé",
-                            description: `${milestone.title} a été marqué comme terminé`
-                          })}>
-                            Marquer comme terminé
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </MainLayout>
-  );
-};
-
-export default ProjectDetails;
