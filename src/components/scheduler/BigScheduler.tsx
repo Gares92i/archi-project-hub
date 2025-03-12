@@ -107,7 +107,8 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         moveEvent={() => {}}
         toggleExpandFunc={() => {}}
       />
-      <style jsx global>{`
+      <style>
+        {`
         .scheduler-container {
           margin: 20px 0;
           height: 600px;
@@ -118,7 +119,8 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         .event-item {
           border-radius: 3px;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
