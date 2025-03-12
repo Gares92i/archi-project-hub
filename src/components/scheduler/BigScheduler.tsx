@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import Scheduler, { SchedulerData, ViewType } from 'react-big-scheduler';
+import Scheduler, { SchedulerData, ViewType, DnDSource } from 'react-big-scheduler';
 import 'react-big-scheduler/lib/css/style.css';
 import moment from 'moment';
 import 'moment/locale/fr';
@@ -20,7 +20,7 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
   const [viewModel, setViewModel] = useState<any>(null);
 
   useEffect(() => {
-    const schedulerData = new SchedulerData(moment().format(), ViewType.Month, false, false, {
+    const schedulerData = new SchedulerData(moment().format('YYYY-MM-DD'), ViewType.Month, false, false, {
       schedulerWidth: '100%',
       besidesWidth: 20,
       weekMaxEvents: 99,
@@ -74,7 +74,7 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
     setViewModel(schedulerData);
   };
 
-  const onViewChange = (schedulerData: SchedulerData, view: ViewType) => {
+  const onViewChange = (schedulerData: SchedulerData, view: any) => {
     schedulerData.setViewType(view.viewType);
     schedulerData.setEvents(schedulerData.events);
     setViewModel(schedulerData);
@@ -91,7 +91,7 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
   }
 
   return (
-    <div className="scheduler-container">
+    <div className="scheduler-container" style={{ height: '100%', width: '100%' }}>
       <Scheduler
         schedulerData={viewModel}
         prevClick={prevClick}
@@ -105,7 +105,20 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         updateEventStart={() => {}}
         updateEventEnd={() => {}}
         moveEvent={() => {}}
+        toggleExpandFunc={() => {}}
       />
+      <style jsx global>{`
+        .scheduler-container {
+          margin: 20px 0;
+          height: 600px;
+        }
+        .scheduler-container table {
+          width: 100%;
+        }
+        .event-item {
+          border-radius: 3px;
+        }
+      `}</style>
     </div>
   );
 };

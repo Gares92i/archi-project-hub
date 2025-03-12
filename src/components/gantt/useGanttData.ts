@@ -11,14 +11,22 @@ export const useGanttData = (currentProject: Project) => {
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
-      const projectTasks = await getTasksByProjectId(currentProject.id);
+      let projectTasks: Task[] = [];
+      
+      if (currentProject.id) {
+        projectTasks = await getTasksByProjectId(currentProject.id);
+      } else {
+        // If no project is selected, return all tasks from the current project
+        projectTasks = currentProject.tasks || [];
+      }
+      
       setTasks(projectTasks);
     } catch (error) {
       console.error("Erreur lors du chargement des tâches:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentProject.id]);
+  }, [currentProject]);
 
   useEffect(() => {
     fetchTasks();

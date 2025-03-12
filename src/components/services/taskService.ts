@@ -1,3 +1,4 @@
+
 import { Task } from "@/components/gantt/types";
 import { toast } from "sonner";
 
@@ -173,7 +174,9 @@ export const getAllTasks = async (): Promise<Task[]> => {
 export const getTasksByProjectId = async (projectId: string): Promise<Task[]> => {
   // Simulation d'un appel API
   return new Promise((resolve) => {
-    const filteredTasks = tasksData.filter(task => task.projectId === projectId);
+    const filteredTasks = projectId ? 
+      tasksData.filter(task => task.projectId === projectId) : 
+      tasksData;
     setTimeout(() => resolve(filteredTasks), 300);
   });
 };
