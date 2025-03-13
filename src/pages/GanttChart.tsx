@@ -20,7 +20,9 @@ const GanttChart = () => {
     const fetchAllTasks = async () => {
       try {
         setIsLoading(true);
+        console.log("Fetching all tasks...");
         const allTasks = await getAllTasks();
+        console.log("Tasks fetched:", allTasks);
         
         // Extract unique projects from tasks
         const projectMap = new Map<string, Project>();
@@ -53,6 +55,7 @@ const GanttChart = () => {
 
   useEffect(() => {
     if (tasks) {
+      console.log("Tasks updated, filtering...", tasks);
       if (selectedProject) {
         setFilteredTasks(tasks.filter(task => task.projectId === selectedProject));
       } else {
@@ -100,8 +103,14 @@ const GanttChart = () => {
             <p>Chargement du planning...</p>
           </div>
         ) : (
-          <div className="border rounded-lg bg-white p-4" style={{ minHeight: '650px' }}>
-            <BigScheduler tasks={filteredTasks} />
+          <div className="border rounded-lg bg-white p-4" style={{ height: '700px', overflow: 'auto' }}>
+            {filteredTasks.length > 0 ? (
+              <BigScheduler tasks={filteredTasks} />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p>Aucune tâche à afficher</p>
+              </div>
+            )}
           </div>
         )}
       </div>

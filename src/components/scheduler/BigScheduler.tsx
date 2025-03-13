@@ -20,47 +20,56 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
   const [viewModel, setViewModel] = useState<any>(null);
 
   useEffect(() => {
-    // Création d'une nouvelle instance de SchedulerData
-    const schedulerData = new SchedulerData(moment().format('YYYY-MM-DD'), ViewType.Month, false, false, {
-      schedulerWidth: '100%',
-      besidesWidth: 20,
-      weekMaxEvents: 99,
-      monthMaxEvents: 99,
-      views: [
-        { viewName: 'Mois', viewType: ViewType.Month },
-        { viewName: 'Semaine', viewType: ViewType.Week },
-        { viewName: 'Jour', viewType: ViewType.Day }
-      ],
-      resourceName: 'Projets',
-      dayMaxEvents: 99,
-      headerEnabled: true,
-      displayWeekend: true,
-      eventItemPopoverEnabled: true,
-      startResizable: true,
-      endResizable: true,
-      movable: true,
-    });
+    try {
+      // Ensure ViewType is properly imported and accessible
+      console.log("ViewType available:", ViewType);
+      
+      // Création d'une nouvelle instance de SchedulerData
+      const schedulerData = new SchedulerData(moment().format('YYYY-MM-DD'), ViewType.Month, false, false, {
+        schedulerWidth: '100%',
+        besidesWidth: 20,
+        weekMaxEvents: 99,
+        monthMaxEvents: 99,
+        views: [
+          { viewName: 'Mois', viewType: ViewType.Month },
+          { viewName: 'Semaine', viewType: ViewType.Week },
+          { viewName: 'Jour', viewType: ViewType.Day }
+        ],
+        resourceName: 'Projets',
+        dayMaxEvents: 99,
+        headerEnabled: true,
+        displayWeekend: true,
+        eventItemPopoverEnabled: true,
+        startResizable: true,
+        endResizable: true,
+        movable: true,
+      });
 
-    // Convertir les tâches au format attendu par le scheduler
-    const resources = [{
-      id: 'project',
-      name: 'Tous les projets'
-    }];
+      // Convertir les tâches au format attendu par le scheduler
+      const resources = [{
+        id: 'project',
+        name: 'Tous les projets'
+      }];
 
-    const events = tasks.map(task => ({
-      id: task.id,
-      title: task.title,
-      start: moment(task.start).format('YYYY-MM-DD HH:mm:ss'),
-      end: moment(task.end).format('YYYY-MM-DD HH:mm:ss'),
-      resourceId: 'project',
-      bgColor: '#1e40af',
-      movable: true,
-      resizable: true,
-    }));
+      const events = tasks.map(task => ({
+        id: task.id,
+        title: task.title,
+        start: moment(task.start).format('YYYY-MM-DD HH:mm:ss'),
+        end: moment(task.end).format('YYYY-MM-DD HH:mm:ss'),
+        resourceId: 'project',
+        bgColor: '#1e40af',
+        movable: true,
+        resizable: true,
+      }));
 
-    schedulerData.setResources(resources);
-    schedulerData.setEvents(events);
-    setViewModel(schedulerData);
+      schedulerData.setResources(resources);
+      schedulerData.setEvents(events);
+      setViewModel(schedulerData);
+      
+      console.log("Scheduler data initialized successfully");
+    } catch (error) {
+      console.error("Error initializing scheduler:", error);
+    }
   }, [tasks]);
 
   const prevClick = (schedulerData: SchedulerData) => {
@@ -108,7 +117,7 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         moveEvent={() => {}}
         toggleExpandFunc={() => {}}
       />
-      <style jsx="true">{`
+      <style>{`
         .scheduler-container {
           margin: 20px 0;
           height: 600px;
