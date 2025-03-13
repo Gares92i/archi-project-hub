@@ -21,46 +21,76 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
 
   useEffect(() => {
     try {
-      // Ensure ViewType is properly imported and accessible
-      console.log("ViewType available:", ViewType);
+      console.log("Tasks received in BigScheduler:", tasks);
+      if (tasks.length === 0) {
+        console.log("No tasks to display");
+        return;
+      }
       
       // Création d'une nouvelle instance de SchedulerData
-      const schedulerData = new SchedulerData(moment().format('YYYY-MM-DD'), ViewType.Month, false, false, {
-        schedulerWidth: '100%',
-        besidesWidth: 20,
-        weekMaxEvents: 99,
-        monthMaxEvents: 99,
-        views: [
-          { viewName: 'Mois', viewType: ViewType.Month },
-          { viewName: 'Semaine', viewType: ViewType.Week },
-          { viewName: 'Jour', viewType: ViewType.Day }
-        ],
-        resourceName: 'Projets',
-        dayMaxEvents: 99,
-        headerEnabled: true,
-        displayWeekend: true,
-        eventItemPopoverEnabled: true,
-        startResizable: true,
-        endResizable: true,
-        movable: true,
+      const schedulerData = new SchedulerData(
+        moment().format('YYYY-MM-DD'), 
+        ViewType.Month, 
+        false, 
+        false, 
+        {
+          schedulerWidth: '100%',
+          besidesWidth: 20,
+          weekMaxEvents: 99,
+          monthMaxEvents: 99,
+          views: [
+            { viewName: 'Mois', viewType: ViewType.Month },
+            { viewName: 'Semaine', viewType: ViewType.Week },
+            { viewName: 'Jour', viewType: ViewType.Day }
+          ],
+          resourceName: 'Projets',
+          dayMaxEvents: 99,
+          headerEnabled: true,
+          displayWeekend: true,
+          eventItemPopoverEnabled: true,
+          startResizable: true,
+          endResizable: true,
+          movable: true,
+        }
+      );
+
+      // Create resource groups by project
+      const uniqueProjects = new Map();
+      tasks.forEach(task => {
+        if (task.projectId && task.projectName) {
+          uniqueProjects.set(task.projectId, task.projectName);
+        }
       });
+      
+      // If no projects found, use a default resource
+      const resources = uniqueProjects.size > 0 
+        ? Array.from(uniqueProjects.entries()).map(([id, name]) => ({
+            id,
+            name
+          }))
+        : [{
+            id: 'project',
+            name: 'Tous les projets'
+          }];
+          
+      console.log("Resources created:", resources);
 
-      // Convertir les tâches au format attendu par le scheduler
-      const resources = [{
-        id: 'project',
-        name: 'Tous les projets'
-      }];
-
-      const events = tasks.map(task => ({
-        id: task.id,
-        title: task.title,
-        start: moment(task.start).format('YYYY-MM-DD HH:mm:ss'),
-        end: moment(task.end).format('YYYY-MM-DD HH:mm:ss'),
-        resourceId: 'project',
-        bgColor: '#1e40af',
-        movable: true,
-        resizable: true,
-      }));
+      // Prepare events for the scheduler
+      const events = tasks.map(task => {
+        const resourceId = task.projectId || 'project';
+        return {
+          id: task.id,
+          title: task.title,
+          start: moment(task.start).format('YYYY-MM-DD HH:mm:ss'),
+          end: moment(task.end).format('YYYY-MM-DD HH:mm:ss'),
+          resourceId,
+          bgColor: '#1e40af',
+          movable: true,
+          resizable: true,
+        };
+      });
+      
+      console.log("Events created:", events);
 
       schedulerData.setResources(resources);
       schedulerData.setEvents(events);
@@ -119,9 +149,10 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
       />
       <style>{`
         .scheduler-container {
-          margin: 20px 0;
-          height: 600px;
+          margin: 0;
+          height: 650px;
           width: 100%;
+          overflow: visible;
         }
         .scheduler-container table {
           width: 100% !important;
@@ -129,17 +160,16 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         .event-item {
           border-radius: 3px;
         }
-        .overflow-y-auto {
+        .scheduler-table, .scheduler-content, .resource-view, .scheduler-view {
+          width: 100% !important;
           overflow: visible !important;
         }
         .scheduler-bg-table {
           width: 100% !important;
         }
-        .resource-view {
-          overflow: visible !important;
-        }
-        .scheduler-view {
-          overflow: visible !important;
+        .scheduler-content {
+          margin: 0 !important;
+          padding: 0 !important;
         }
       `}</style>
     </div>

@@ -40,7 +40,9 @@ const GanttChart = () => {
           }
         });
         
-        setAllProjects(Array.from(projectMap.values()));
+        const projectsArray = Array.from(projectMap.values());
+        console.log("Projects extracted:", projectsArray);
+        setAllProjects(projectsArray);
         setFilteredTasks(allTasks);
         setIsLoading(false);
       } catch (err) {
@@ -54,7 +56,7 @@ const GanttChart = () => {
   }, []);
 
   useEffect(() => {
-    if (tasks) {
+    if (tasks && tasks.length > 0) {
       console.log("Tasks updated, filtering...", tasks);
       if (selectedProject) {
         setFilteredTasks(tasks.filter(task => task.projectId === selectedProject));
@@ -81,6 +83,9 @@ const GanttChart = () => {
     }
   };
 
+  // Debug output
+  console.log("Current filteredTasks:", filteredTasks);
+
   return (
     <MainLayout>
       <div className="mb-6">
@@ -103,7 +108,7 @@ const GanttChart = () => {
             <p>Chargement du planning...</p>
           </div>
         ) : (
-          <div className="border rounded-lg bg-white p-4" style={{ height: '700px', overflow: 'auto' }}>
+          <div className="border rounded-lg bg-white" style={{ height: '700px' }}>
             {filteredTasks.length > 0 ? (
               <BigScheduler tasks={filteredTasks} />
             ) : (
