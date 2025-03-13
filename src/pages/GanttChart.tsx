@@ -100,8 +100,10 @@ const GanttChart = () => {
             <p>Chargement du planning...</p>
           </div>
         ) : (
-          <div className="border rounded-lg bg-white p-4" style={{ height: '650px', overflow: 'auto' }}>
-            <BigScheduler tasks={filteredTasks} />
+          <div className="border rounded-lg bg-white p-4" style={{ height: '650px', position: 'relative' }}>
+            <div className="w-full h-full">
+              <BigScheduler tasks={filteredTasks} />
+            </div>
           </div>
         )}
       </div>
