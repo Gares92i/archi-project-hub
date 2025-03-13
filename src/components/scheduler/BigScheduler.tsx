@@ -92,7 +92,7 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
   }
 
   return (
-    <div className="scheduler-container" style={{ height: '100%', width: '100%' }}>
+    <div className="scheduler-container">
       <Scheduler
         schedulerData={viewModel}
         prevClick={prevClick}
@@ -108,24 +108,31 @@ const BigScheduler = ({ tasks }: BigSchedulerProps) => {
         moveEvent={() => {}}
         toggleExpandFunc={() => {}}
       />
-      <style>
-        {`
+      <style jsx="true">{`
         .scheduler-container {
           margin: 20px 0;
           height: 600px;
-          overflow: visible;
+          width: 100%;
         }
         .scheduler-container table {
-          width: 100%;
+          width: 100% !important;
         }
         .event-item {
           border-radius: 3px;
         }
-        .overflow-y-auto .scheduler-container {
+        .overflow-y-auto {
           overflow: visible !important;
         }
-        `}
-      </style>
+        .scheduler-bg-table {
+          width: 100% !important;
+        }
+        .resource-view {
+          overflow: visible !important;
+        }
+        .scheduler-view {
+          overflow: visible !important;
+        }
+      `}</style>
     </div>
   );
 };
