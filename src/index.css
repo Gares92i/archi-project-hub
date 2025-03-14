@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -219,39 +220,4 @@
   overflow-wrap: break-word;
   word-wrap: break-word;
   hyphens: auto;
-}
-
-/* React Big Scheduler styles */
-.scheduler-container {
-  width: 100%;
-  height: 600px;
-  overflow: auto;
-}
-
-.scheduler-container .header-row {
-  font-weight: bold;
-}
-
-.scheduler-container .resources-events-container {
-  overflow: auto;
-}
-
-.scheduler-container .event-item {
-  border-radius: 3px;
-  padding: 2px 5px;
-}
-
-.scheduler-container .timeline-event {
-  cursor: pointer;
-}
-
-/* Make sure the scheduler is visible within its container */
-.react-bs-container {
-  height: 100%;
-  width: 100%;
-}
-
-/* Ensure tables display properly */
-.resource-view, .scheduler-bg-table, .scheduler-table {
-  width: 100% !important;
 }
